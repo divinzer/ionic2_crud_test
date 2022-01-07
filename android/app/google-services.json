@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "483785408856",
+    "project_id": "hygienecheck-8b484",
+    "storage_bucket": "hygienecheck-8b484.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:483785408856:android:18427475b3fe93e64a652d",
+        "android_client_info": {
+          "package_name": "com.plating.hygienecheck"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "483785408856-pm97gquqfdfan8mpd3c14hu64aifnm76.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJpx0ci6SL-MEAsaxFYsVz_MgWztGf62A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "483785408856-pm97gquqfdfan8mpd3c14hu64aifnm76.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
