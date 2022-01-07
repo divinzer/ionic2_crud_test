@@ -10,7 +10,7 @@ import {categorySelector} from 'src/modules/category/selectors';
 import {configsSelector, languageSelector} from 'src/modules/common/selectors';
 import {padding, margin} from 'src/components/config/spacing';
 
-import {homeTabs, mainStack} from 'src/config/navigator';
+import {mainStack} from 'src/config/navigator';
 import {excludeCategory} from '../utils/category';
 import {exclude_categories_sidebar} from '../config/category';
 
@@ -26,14 +26,14 @@ class Sidebar extends React.Component {
   render() {
     const {t, category, configs, language, navigation} = this.props;
     const dataHelpInfo = [
-      {
-        id: '1',
-        name: t('common:text_home'),
-        router: mainStack.home_tab,
-        params: {
-          screen: homeTabs.home_drawer,
-        },
-      },
+      // {
+      //   id: '1',
+      //   name: t('common:text_home'),
+      //   router: mainStack.home_tab,
+      //   params: {
+      //     screen: homeTabs.home_drawer,
+      //   },
+      // },
       {
         id: '2',
         name: t('common:text_blogs'),

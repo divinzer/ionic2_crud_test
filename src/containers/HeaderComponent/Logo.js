@@ -10,7 +10,7 @@ import {homeDrawer} from 'src/config/navigator';
 const Logo = ({images, ...rest}) => {
   const navigation = useNavigation();
   return (
-    <TouchableOpacity onPress={() => navigation.navigate(homeDrawer.home)}>
+    <TouchableOpacity onPress={() => navigation.navigate(homeDrawer.product)}>
       <Image source={images.logo} resizeMode="stretch" {...rest} />
     </TouchableOpacity>
   );
