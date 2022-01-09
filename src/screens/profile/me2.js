@@ -24,30 +24,21 @@ import {TextHeader, CartIcon} from 'src/containers/HeaderComponent';
 import {grey5} from 'src/components/config/colors';
 import {margin} from 'src/components/config/spacing';
 
-// const mapStateToProps = createStructuredSelector({
-//   auth: authSelector(),
-//   wishList: wishListSelector(),
-//   configs: configsSelector(),
-//   language: languageSelector(),
-// });
+const stateSelector = createStructuredSelector({
+  auth: authSelector(),
+  wishList: wishListSelector(),
+  configs: configsSelector(),
+  language: languageSelector(),
+});
 
-const mapStateToProps = state => {
-  return {
-    auth: authSelector(state),
-    wishList: wishListSelector(state),
-    configs: configsSelector(state),
-    language: languageSelector(state),
-  };
-};
-
-
-export default function MeScreen() {
+function MeScreen() {
   const {
     auth,
     wishList,
     configs,
     language,
-  } = useSelector(mapStateToProps);
+  } = useSelector(stateSelector);
+  console.log('111', auth)
 
   const navigation = useNavigation();
   const {t} = useTranslation();
@@ -153,3 +144,6 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
 });
+
+export default MeScreen;
+// export default connect(mapStateToProps)(withTranslation()(MeScreen));
