@@ -1,4 +1,4 @@
-package com.rn_oreo;
+package com.plating.hygienecheck;
 
 import android.os.Bundle;
 
@@ -23,7 +23,7 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "rn_oreo";
+    return "hygiene_check";
   }
 
   @Override

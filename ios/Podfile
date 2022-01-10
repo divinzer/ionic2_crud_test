@@ -7,7 +7,7 @@ target 'OneSignalNotificationServiceExtension' do
   pod 'OneSignal', '>= 2.9.3', '< 3.0'
 end
 
-target 'rn_oreo' do
+target 'hygiene_check' do
   config = use_native_modules!
 
   use_react_native!(
@@ -16,7 +16,7 @@ target 'rn_oreo' do
     :hermes_enabled => false
   )
 
-  target 'rn_oreoTests' do
+  target 'hygiene_checkTests' do
     inherit! :complete
     # Pods for testing
   end

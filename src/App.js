@@ -3,7 +3,7 @@
  * Main app
  *
  * App Name:          Oreo fashion
- * Author:            Rnlab.io
+ * Author:            plating.com
  *
  * @since             1.0.0
  *
