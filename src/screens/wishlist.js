@@ -1,7 +1,9 @@
-import React from 'react';
-import {connect} from 'react-redux';
-import {withTranslation} from 'react-i18next';
-import isEqual from 'lodash/isEqual';
+import React, {useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useNavigation} from '@react-navigation/native';
+// import isEqual from 'lodash/isEqual';
+import {createStructuredSelector} from 'reselect';
+import {useSelector, useDispatch} from 'react-redux';
 import {StyleSheet, View, ActivityIndicator, I18nManager} from 'react-native';
 import {Header, ThemedView} from 'src/components';
 import {SwipeListView} from 'react-native-swipe-list-view';
@@ -10,44 +12,55 @@ import {TextHeader, CartIcon} from 'src/containers/HeaderComponent';
 import Empty from 'src/containers/Empty';
 import ButtonSwiper from 'src/containers/ButtonSwiper';
 
-import {removeWishList} from 'src/modules/common/actions';
-import {fetchWishList} from 'src/modules/product/actions';
-import {
-  loadingWishListSelector,
-  dataWishListSelector,
-} from 'src/modules/product/selectors';
+import {fetchChecklist, fetchWeeklyCheck} from 'src/modules/list/actions';
 
 import {
-  wishListSelector,
-  countWishListSelector,
-} from 'src/modules/common/selectors';
+  loadingListSelector,
+  checkListSelector,
+  weeklyCheckSelector,
+} from 'src/modules/list/selectors';
 
 import {margin} from 'src/components/config/spacing';
 import {homeTabs} from 'src/config/navigator';
 
-class WishListScreen extends React.Component {
-  componentDidMount() {
-    this.fetchData();
-  }
+const stateSelector = createStructuredSelector({
+  loading: loadingListSelector(),
+  checkList: checkListSelector(),
+  weeklyCheck: weeklyCheckSelector(),
+});
 
-  fetchData = (data = this.props.wishList) => {
-    const {dispatch} = this.props;
-    dispatch(fetchWishList(data));
-  };
+export default function WishListScreen() {
+  const navigation = useNavigation();
+  const {t} = useTranslation();
+  const dispatch = useDispatch();
+  const {loading, checkList, weeklyCheck} = useSelector(stateSelector);
+  // componentDidMount() {
+  //   this.fetchData();
+  // }
+  const subtitle = '위생점검 리스트';
 
-  removeItem = product_id => {
-    const {dispatch} = this.props;
+  const fetchData = () => dispatch(fetchChecklist());
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // componentDidUpdate(prevProps) {
+  //   const {wishList} = this.props;
+  //   if (!isEqual(wishList, prevProps.wishList)) {
+  //     this.fetchData(wishList);
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   fetchData();
+  // }, [checkList, weeklyCheck]);
+
+  const removeItem = product_id => {
     dispatch(removeWishList(product_id));
   };
 
-  componentDidUpdate(prevProps) {
-    const {wishList} = this.props;
-    if (!isEqual(wishList, prevProps.wishList)) {
-      this.fetchData(wishList);
-    }
-  }
-  renderData = data => {
-    const {t, navigation} = this.props;
+  const renderData = data => {
     if (!data || data.length < 1) {
       return (
         <Empty
@@ -63,7 +76,7 @@ class WishListScreen extends React.Component {
       <SwipeListView
         useFlatList
         keyExtractor={item => `${item.id}`}
-        data={data}
+        data={checkList}
         renderItem={({item, index}) => (
           <ProductItem
             item={item}
@@ -73,43 +86,34 @@ class WishListScreen extends React.Component {
         )}
         renderHiddenItem={({item}) => (
           <View style={styles.viewSwiper}>
-            <ButtonSwiper onPress={() => this.removeItem(item.id)} />
+            <ButtonSwiper onPress={() => removeItem(item.id)} />
           </View>
         )}
         leftOpenValue={70}
         rightOpenValue={-70}
-        disableLeftSwipe={I18nManager.isRTL}
-        disableRightSwipe={!I18nManager.isRTL}
+        disableLeftSwipe={true}
+        disableRightSwipe={false}
       />
     );
   };
 
-  render() {
-    const {t, countWishlist, data, loading} = this.props;
-
-    const subtitle =
-      countWishlist > 1
-        ? t('common:text_items', {count: countWishlist})
-        : t('common:text_item', {count: countWishlist});
-
-    return (
-      <ThemedView style={styles.container}>
-        <Header
-          centerComponent={
-            <TextHeader title={t('common:text_wishList')} subtitle={subtitle} />
-          }
-          rightComponent={<CartIcon />}
-        />
-        {loading ? (
-          <View style={styles.viewLoading}>
-            <ActivityIndicator size="small" />
-          </View>
-        ) : (
-          this.renderData(data)
-        )}
-      </ThemedView>
-    );
-  }
+  return (
+    <ThemedView style={styles.container}>
+      <Header
+        centerComponent={
+          <TextHeader title={t('common:text_wishList')} subtitle={subtitle} />
+        }
+        rightComponent={<CartIcon />}
+      />
+      {loading ? (
+        <View style={styles.viewLoading}>
+          <ActivityIndicator size="small" />
+        </View>
+      ) : (
+        renderData(checkList)
+      )}
+    </ThemedView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -130,11 +134,11 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = state => ({
-  data: dataWishListSelector(state).toJS(),
-  loading: loadingWishListSelector(state),
-  wishList: wishListSelector(state).toJS(),
-  countWishlist: countWishListSelector(state),
-});
+// const mapStateToProps = state => ({
+//   data: dataWishListSelector(state).toJS(),
+//   loading: loadingWishListSelector(state),
+//   wishList: wishListSelector(state).toJS(),
+//   countWishlist: countWishListSelector(state),
+// });
 
-export default connect(mapStateToProps)(withTranslation()(WishListScreen));
+// export default connect(mapStateToProps)(withTranslation()(WishListScreen));

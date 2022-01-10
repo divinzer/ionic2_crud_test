@@ -8,6 +8,7 @@ import cartReducer from './modules/cart/reducer';
 import orderReducer from './modules/order/reducer';
 import vendorReducer from './modules/vendor/reducer';
 import checkoutReducer from './modules/checkout/reducer';
+import listReducer from './modules/list/reducer';
 
 /**
  * Root reducer
@@ -22,6 +23,7 @@ const rootReducers = combineReducers({
   order: orderReducer,
   vendor: vendorReducer,
   checkout: checkoutReducer,
+  list: listReducer,
 });
 
 export default rootReducers;

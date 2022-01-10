@@ -1,4 +1,5 @@
 import firebase from '@react-native-firebase/app';
+import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-community/google-signin';
 import {LoginManager} from 'react-native-fbsdk';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -85,6 +86,7 @@ async function signOut() {
  * @returns {IterableIterator<*>}
  */
 function* doLoginSuccess(token, user = {}, method = 'email') {
+  console.log('token', token);
   yield put({
     type: Actions.SIGN_IN_WITH_EMAIL_SUCCESS,
     payload: {token, user},
@@ -110,13 +112,13 @@ function* doLoginSuccess(token, user = {}, method = 'email') {
  */
 function* signInWithEmailSaga({username, password}) {
   try {
-    const language = yield select(languageSelector);
-    const {token, user} = yield call(loginWithEmail, {
+    const {uid, user} = yield call(loginWithEmail, {
       username,
       password,
-      language,
     });
-    yield call(doLoginSuccess, token, user, 'email');
+    console.log('user', user);
+    console.log('aaa', user.refreshToken);
+    yield call(doLoginSuccess, uid, user, 'email');
   } catch (e) {
     // yield call(handleError, e)
     yield put({

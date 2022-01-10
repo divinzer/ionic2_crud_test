@@ -1,3 +1,4 @@
+import auth from '@react-native-firebase/auth';
 import queryString from 'query-string';
 import request from 'src/utils/fetch';
 import {PLUGIN_NAME} from 'src/config/development';
@@ -9,8 +10,7 @@ import {PLUGIN_NAME} from 'src/config/development';
  * @returns {Promise<unknown>}
  */
 export const loginWithEmail = ({username, password}) =>
-  request.post(`/${PLUGIN_NAME}/v1/login`, {username, password});
-
+  auth().signInWithEmailAndPassword(username, password);
 /**
  * Login with Firebase
  * @param idToken Firebase user id token

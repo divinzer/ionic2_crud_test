@@ -14,15 +14,13 @@
  * @flow
  */
 
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
 import './config-i18n';
 
 import {StatusBar} from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import {withTranslation} from 'react-i18next';
-import {connect} from 'react-redux';
-import {compose} from 'redux';
+import {useSelector} from 'react-redux';
 
 import FlashMessage from 'react-native-flash-message';
 
@@ -32,87 +30,50 @@ import {ThemeProvider} from 'src/components';
 import Router from './navigation/root-switch';
 import Unconnected from './containers/Unconnected';
 
-import {
-  themeSelector,
-  colorsSelector,
-  languageSelector,
-} from './modules/common/selectors';
-
-class AppRouter extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isCheck: false,
-      isConnected: true,
-    };
-    const {i18n, language} = props;
-    if (i18n.language !== language) {
-      i18n.changeLanguage(language);
-    }
-  }
-
-  componentDidMount() {
-    NetInfo.addEventListener(state => {
-      const {isCheck} = this.state;
-      const {isConnected} = state;
-      if (!isConnected) {
-        this.setState({
-          isConnected: false,
-        });
-      }
-      if (isCheck && isConnected) {
-        this.setState({
-          isConnected: true,
-          isCheck: false,
-        });
-      }
-    });
-  }
-
-  checkInternet = () => {
-    this.setState({
-      isCheck: true,
-    });
-  };
-
-  componentDidUpdate(prevProps) {
-    const {i18n, language} = this.props;
-    if (i18n.language !== language) {
-      i18n.changeLanguage(language);
-    }
-  }
-
-  render() {
-    const {theme, colors} = this.props;
-    const {isConnected} = this.state;
-
-    const themeColor = theme === 'light' ? getThemeLight(colors) : darkColors;
-    const barStyle = theme === 'light' ? 'dark-content' : 'light-content';
-
-    return (
-      <ThemeProvider theme={themeColor}>
-        <StatusBar
-          translucent
-          barStyle={barStyle}
-          backgroundColor="transparent"
-        />
-        {!isConnected ? (
-          <Unconnected clickTry={this.checkInternet} />
-        ) : (
-          <Router />
-        )}
-        <FlashMessage position="top" />
-      </ThemeProvider>
-    );
-  }
-}
+import {themeSelector, colorsSelector} from './modules/common/selectors';
 
 const mapStateToProps = state => {
   return {
-    language: languageSelector(state),
     theme: themeSelector(state),
     colors: colorsSelector(state),
   };
 };
 
-export default compose(withTranslation(), connect(mapStateToProps))(AppRouter);
+export default function AppRouter() {
+  const {theme, colors} = useSelector(mapStateToProps);
+
+  const themeColor = theme === 'light' ? getThemeLight(colors) : darkColors;
+  const barStyle = theme === 'light' ? 'dark-content' : 'light-content';
+  const [isCheck, setCheck] = useState(false);
+  const [isConnected, setConnected] = useState(true);
+
+  useEffect(() => {
+    NetInfo.addEventListener(state => {
+      if (!isConnected) {
+        setConnected(false);
+      }
+      if (isCheck && isConnected) {
+        setConnected(true);
+        setCheck(false);
+      }
+    });
+  }, [isCheck, isConnected]);
+
+  const checkInternet = () => {
+    setCheck(true);
+  };
+
+  return (
+    <ThemeProvider theme={themeColor}>
+      <StatusBar
+        translucent
+        barStyle={barStyle}
+        backgroundColor="transparent"
+      />
+      {!isConnected ? <Unconnected clickTry={checkInternet} /> : <Router />}
+      <FlashMessage position="top" />
+    </ThemeProvider>
+  );
+}
+
+// export default compose(withTranslation(), connect(mapStateToProps))(AppRouter);
