@@ -1,6 +1,6 @@
 export default {
   AppleAppID: '1475075333',
-  GooglePackageName: 'com.rn_oreo',
+  GooglePackageName: 'com.plating.hygienecheck',
   preferInApp: true,
   openAppStoreIfInAppFails: true,
 };

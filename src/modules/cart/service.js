@@ -5,7 +5,7 @@ import {PLUGIN_NAME} from 'src/config/development';
 /**
  * Add to cart
  * @param data Cart data { product_id: Number, quantity: Number, variation_id: Number, variation: Array, cart_item_data: Object | Array }
- * @package rn_oreo
+ * @package hygiene_check
  * @since 1.0.0
  * @version 1.0.0
  * @returns {Promise | Promise<unknown>}
@@ -25,7 +25,7 @@ export const updateCartQuantity = (data, cartKey) =>
 
 /**
  * Get list cart
- * @package rn_oreo
+ * @package hygiene_check
  * @since 1.0.0
  * @version 1.0.0
  * @returns {Promise | Promise<unknown>}

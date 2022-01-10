@@ -15,7 +15,7 @@ export const cartSelector = createSelector(
 
 /**
  * Cart total selector
- * @package rn_oreo
+ * @package hygiene_check
  * @since 1.0.0
  */
 export const cartTotalSelector = createSelector(
@@ -25,7 +25,7 @@ export const cartTotalSelector = createSelector(
 
 /**
  * Cart key selector
- * @package rn_oreo
+ * @package hygiene_check
  * @since 1.0.0
  */
 export const cartKeySelector = createSelector(rootCart, cart =>
@@ -75,7 +75,7 @@ export const loadingUpdateQuantitySelector = createSelector(rootCart, data =>
 
 /**
  * Cart coupons applied selector
- * @package rn_oreo
+ * @package hygiene_check
  * @since 1.0.0
  */
 export const couponsAppliedSelector = createSelector(
@@ -85,7 +85,7 @@ export const couponsAppliedSelector = createSelector(
 
 /**
  * Cart coupons add loading selector
- * @package rn_oreo
+ * @package hygiene_check
  * @since 1.0.0
  */
 export const couponsAddLoadingSelector = createSelector(rootCart, cart =>
@@ -94,7 +94,7 @@ export const couponsAddLoadingSelector = createSelector(rootCart, cart =>
 
 /**
  * Cart coupons delete loading selector
- * @package rn_oreo
+ * @package hygiene_check
  * @since 1.0.0
  */
 export const couponsDeleteLoadingSelector = createSelector(rootCart, cart =>
