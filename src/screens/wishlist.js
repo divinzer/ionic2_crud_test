@@ -71,7 +71,6 @@ export default function WishListScreen() {
   };
 
   const renderData = data => {
-    console.log('data', data);
     if (!user) {
       return (
         <Empty
@@ -121,7 +120,7 @@ export default function WishListScreen() {
           <ActivityIndicator size="small" />
         </View>
       ) : (
-        renderData(weeklyCheck)
+        renderData(weeklyCheck.data)
       )}
     </ThemedView>
   );

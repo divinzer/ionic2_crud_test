@@ -94,11 +94,8 @@ function* signOutSaga() {
  * @returns {IterableIterator<*>}
  */
 function* fetchCheckListSaga() {
-  console.log('fetchSaga');
   try {
     const data = yield call(fetchChecklist);
-    console.log('data', data);
-
     yield put({
       type: Actions.FETCH_CHECK_LIST_SUCCESS,
       payload: data,
@@ -114,13 +111,14 @@ function* fetchCheckListSaga() {
  * Fetch pfetchWeeklyCheck saga
  * @returns {IterableIterator<*>}
  */
-function* fetchPaymentGatewaySaga() {
+function* fetchweeklyListSaga() {
   try {
     const data = yield call(fetchWeeklyCheck);
     yield put({
       type: Actions.FETCH_WEEKLY_CHECK_SUCCESS,
       payload: data,
     });
+    console.log('done', data);
   } catch (error) {
     yield put({
       type: Actions.FETCH_WEEKLY_CHECK_ERROR,
@@ -132,5 +130,5 @@ export default function* firebaseSaga() {
   yield takeEvery(Actions.SIGN_IN_WITH_FIREBASE, signInWithEmailSaga);
   yield takeEvery(Actions.SIGN_OUT, signOutSaga);
   yield takeEvery(Actions.FETCH_CHECK_LIST, fetchCheckListSaga);
-  yield takeEvery(Actions.FETCH_WEEKLY_CHECK, fetchPaymentGatewaySaga);
+  yield takeEvery(Actions.FETCH_WEEKLY_CHECK, fetchweeklyListSaga);
 }

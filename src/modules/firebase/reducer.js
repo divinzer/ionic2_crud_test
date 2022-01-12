@@ -34,6 +34,7 @@ export const initState = {
  */
 const firebaseReducer = produce((draft, action) => {
   const {type, payload} = action;
+  console.log('payload', payload);
   switch (type) {
     // auth
     case Actions.SIGN_IN_WITH_FIREBASE:

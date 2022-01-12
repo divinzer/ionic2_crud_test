@@ -19,7 +19,7 @@ export const homeTabs = {
 
 export const mainStack = {
   home_tab: 'HomeTab',
-
+  wish_list: 'WishListStack',
   blogs: 'BlogsScreen',
   blog: 'BlogScreen',
 

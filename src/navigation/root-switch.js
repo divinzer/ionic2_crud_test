@@ -32,8 +32,6 @@ function RootStack({loading, isGettingStart, isLogin, loginRequired}) {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       {loading ? (
         <Stack.Screen name={rootSwitch.loading} component={Loading} />
-      ) : isGettingStart ? (
-        <Stack.Screen name={rootSwitch.start} component={GetStart} />
       ) : loginRequired && !isLogin ? (
         <Stack.Screen name={rootSwitch.auth} component={AuthStack} />
       ) : isLogin ? (
@@ -53,10 +51,7 @@ function RootStack({loading, isGettingStart, isLogin, loginRequired}) {
               animationEnabled: false,
             }}
           />
-          <Stack.Screen
-            name={rootSwitch.auth}
-            component={AuthStack}
-          />
+          <Stack.Screen name={rootSwitch.auth} component={AuthStack} />
         </>
       )}
     </Stack.Navigator>

@@ -58,7 +58,7 @@ function MainStack() {
         name={mainStack.home_tab}
         component={HomeTabs}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.blogs}
         component={Blogs}
@@ -72,7 +72,7 @@ function MainStack() {
         options={{headerShown: false}}
         name={mainStack.checkout}
         component={Checkout}
-      />
+      /> */}
       {/* <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.webview_checkout}
@@ -88,7 +88,7 @@ function MainStack() {
         name={mainStack.webview_thank_you}
         component={WeViewThankYou}
       /> */}
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.products}
         component={Products}
@@ -162,7 +162,7 @@ function MainStack() {
         options={{headerShown: false}}
         name={mainStack.store_review}
         component={StoreReview}
-      />
+      /> */}
       {/* <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.linking_webview}
@@ -173,7 +173,7 @@ function MainStack() {
         name={mainStack.setting}
         component={SettingScreen}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.contact}
         component={ContactScreen}
@@ -227,7 +227,7 @@ function MainStack() {
         options={{headerShown: false}}
         name={mainStack.page}
         component={Page}
-      />
+      /> */}
     </Stack.Navigator>
   );
 }
