@@ -55,7 +55,7 @@ class GetStartVideo extends React.Component {
                 </Text>
               </View>
               <View style={styles.bottomBig}>
-                <Button
+                {/* <Button
                   title="Create Account"
                   buttonStyle={styles.buttonRegister}
                   titleStyle={styles.textButtonRegister}
@@ -63,7 +63,7 @@ class GetStartVideo extends React.Component {
                   onPress={() =>
                     NavigationServices.navigate(authStack.register)
                   }
-                />
+                /> */}
                 <Button
                   title="Login"
                   type="outline"

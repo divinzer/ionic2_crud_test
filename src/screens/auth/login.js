@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {StyleSheet, ScrollView, KeyboardAvoidingView} from 'react-native';
 import {
@@ -15,24 +16,22 @@ import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
 
 import {rootSwitch} from 'src/config/navigator';
 
-import {signInWithEmail} from 'src/modules/auth/actions';
-import {authSelector} from 'src/modules/auth/selectors';
-import {requiredLoginSelector} from 'src/modules/common/selectors';
+import {signInWithEmail} from 'src/modules/firebase/actions';
+import {authSelector} from 'src/modules/firebase/selectors';
+// import {requiredLoginSelector} from 'src/modules/common/selectors';
 import {margin} from 'src/components/config/spacing';
 
 import {changeColor} from 'src/utils/text-html';
 
-const mapStateToProps = state => {
-  return {
-    auth: authSelector(state),
-    requiredLogin: requiredLoginSelector(state),
-  };
-};
+const stateSelector = createStructuredSelector({
+  auth: authSelector(),
+  // requiredLogin: requiredLoginSelector(),
+});
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {auth, requiredLogin} = useSelector(mapStateToProps);
+  const {auth} = useSelector(stateSelector);
   const {pending, loginError} = auth;
   const {message, errors} = loginError;
 
@@ -48,15 +47,13 @@ const LoginScreen = () => {
       {({theme}) => (
         <ThemedView isFullView>
           <Header
-            leftComponent={
-              !requiredLogin && (
-                <IconHeader
-                  name="x"
-                  size={24}
-                  onPress={() => navigation.navigate(rootSwitch.main)}
-                />
-              )
-            }
+            // leftComponent={
+            //   <IconHeader
+            //     name="x"
+            //     size={24}
+            //     onPress={() => navigation.navigate(rootSwitch.main)}
+            //   />
+            // }
             centerComponent={<TextHeader title={'LogIn'} />}
           />
           <KeyboardAvoidingView behavior="height" style={styles.keyboard}>

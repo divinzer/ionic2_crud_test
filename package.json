@@ -1,13 +1,14 @@
 {
   "name": "hygiene_check",
-  "version": "2.4.2",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postinstall": "rndebugger-open"
   },
   "dependencies": {
     "@invertase/react-native-apple-authentication": "^2.1.5",
@@ -42,6 +43,7 @@
     "react-i18next": "^11.15.1",
     "react-native": "0.66.4",
     "react-native-confirmation-code-field": "^7.2.0",
+    "react-native-debugger-open": "^0.3.25",
     "react-native-fbsdk": "^3.0.0",
     "react-native-file-viewer": "^2.1.5",
     "react-native-flash-message": "^0.2.0",

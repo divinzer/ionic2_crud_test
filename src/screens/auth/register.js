@@ -26,7 +26,6 @@ import InputMobile from 'src/containers/input/InputMobile';
 import TextHtml from 'src/containers/TextHtml';
 import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
 import ModalVerify from './containers/ModalVerify';
-import SocialMethods from './containers/SocialMethods';
 
 import {signUpWithEmail} from 'src/modules/auth/actions';
 import {authSelector} from 'src/modules/auth/selectors';
@@ -271,7 +270,6 @@ class RegisterScreen extends React.Component {
                     onPress={this.handleRegister}
                     loading={loading || pending}
                   />
-                  <SocialMethods style={styles.viewAccount} />
                   <Text
                     medium
                     style={styles.textHaveAccount}

@@ -40,14 +40,14 @@ const HeaderMe = props => {
           {t('profile:text_title_logout')}
         </Text>
         <Row style={styles.logoutViewButton}>
-          <Button
+          {/* <Button
             title={t('profile:text_register')}
             containerStyle={styles.flex}
             type="outline"
             onPress={() =>
               navigation.navigate(rootSwitch.auth, {screen: authStack.register})
             }
-          />
+          /> */}
           <Separator small />
           <Button
             title={t('profile:text_signin')}

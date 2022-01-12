@@ -1,7 +1,7 @@
 export const authStack = {
   login: 'LoginScreen',
   login_mobile: 'LoginMobileScreen',
-  register: 'RegisterScreen',
+  // register: 'RegisterScreen',
   forgot: 'ForgotScreen',
 };
 

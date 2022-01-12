@@ -1,5 +1,4 @@
 import firebase from '@react-native-firebase/app';
-import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-community/google-signin';
 import {LoginManager} from 'react-native-fbsdk';
 import AsyncStorage from '@react-native-community/async-storage';

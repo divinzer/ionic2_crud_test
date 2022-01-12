@@ -12,13 +12,14 @@ import {TextHeader, CartIcon} from 'src/containers/HeaderComponent';
 import Empty from 'src/containers/Empty';
 import ButtonSwiper from 'src/containers/ButtonSwiper';
 
-import {fetchChecklist, fetchWeeklyCheck} from 'src/modules/list/actions';
+import {fetchChecklist, fetchWeeklyCheck} from 'src/modules/firebase/actions';
 
 import {
   loadingListSelector,
   checkListSelector,
   weeklyCheckSelector,
-} from 'src/modules/list/selectors';
+  tokenSelector,
+} from 'src/modules/firebase/selectors';
 
 import {margin} from 'src/components/config/spacing';
 import {homeTabs} from 'src/config/navigator';
@@ -27,30 +28,25 @@ const stateSelector = createStructuredSelector({
   loading: loadingListSelector(),
   checkList: checkListSelector(),
   weeklyCheck: weeklyCheckSelector(),
+  token: tokenSelector(),
 });
 
 export default function WishListScreen() {
   const navigation = useNavigation();
   const {t} = useTranslation();
   const dispatch = useDispatch();
-  const {loading, checkList, weeklyCheck} = useSelector(stateSelector);
+  const {loading, checkList, weeklyCheck, token} = useSelector(stateSelector);
   // componentDidMount() {
   //   this.fetchData();
   // }
   const subtitle = '위생점검 리스트';
 
-  const fetchData = () => dispatch(fetchChecklist());
+  const fetchData = () => dispatch(fetchChecklist(token));
 
   useEffect(() => {
+    console.log('wtoken', token);
     fetchData();
   }, []);
-
-  // componentDidUpdate(prevProps) {
-  //   const {wishList} = this.props;
-  //   if (!isEqual(wishList, prevProps.wishList)) {
-  //     this.fetchData(wishList);
-  //   }
-  // }
 
   // useEffect(() => {
   //   fetchData();

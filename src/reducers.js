@@ -8,7 +8,7 @@ import cartReducer from './modules/cart/reducer';
 import orderReducer from './modules/order/reducer';
 import vendorReducer from './modules/vendor/reducer';
 import checkoutReducer from './modules/checkout/reducer';
-import listReducer from './modules/list/reducer';
+import firebaseReducer from './modules/firebase/reducer';
 
 /**
  * Root reducer
@@ -23,7 +23,7 @@ const rootReducers = combineReducers({
   order: orderReducer,
   vendor: vendorReducer,
   checkout: checkoutReducer,
-  list: listReducer,
+  firebase: firebaseReducer,
 });
 
 export default rootReducers;

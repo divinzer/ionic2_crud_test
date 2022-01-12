@@ -14,7 +14,6 @@ import Container from 'src/containers/Container';
 import Input from 'src/containers/input/Input';
 import TextHtml from 'src/containers/TextHtml';
 import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
-import SocialMethods from './containers/SocialMethods';
 
 import {rootSwitch, authStack} from 'src/config/navigator';
 
@@ -111,7 +110,6 @@ class LoginScreen extends React.Component {
                     </Text>
                     <Divider style={styles.divOr} />
                   </View>
-                  <SocialMethods style={styles.viewSocial} />
                 </Container>
               </ScrollView>
             </KeyboardAvoidingView>
@@ -119,11 +117,11 @@ class LoginScreen extends React.Component {
               <Text h6 colorThird style={styles.textAccount}>
                 {t('auth:text_have_account')}
               </Text>
-              <Button
+              {/* <Button
                 title={t('auth:text_register')}
                 type="outline"
                 onPress={() => navigation.navigate(authStack.register)}
-              />
+              /> */}
             </Container>
           </ThemedView>
         )}

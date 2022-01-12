@@ -6,7 +6,6 @@ import {rootSwitch} from 'src/config/navigator';
 
 import MainStack from './main-stack';
 import AuthStack from './auth-stack';
-import AuthDigitsStack from './auth-digits-stack';
 
 import Loading from 'src/screens/loading';
 import GetStart from 'src/screens/get-start';
@@ -36,10 +35,7 @@ function RootStack({loading, isGettingStart, isLogin, loginRequired}) {
       ) : isGettingStart ? (
         <Stack.Screen name={rootSwitch.start} component={GetStart} />
       ) : loginRequired && !isLogin ? (
-        <Stack.Screen
-          name={rootSwitch.auth}
-          component={SUPPORT_DIGITS_PLUGIN ? AuthDigitsStack : AuthStack}
-        />
+        <Stack.Screen name={rootSwitch.auth} component={AuthStack} />
       ) : isLogin ? (
         <Stack.Screen
           name={rootSwitch.main}
@@ -59,7 +55,7 @@ function RootStack({loading, isGettingStart, isLogin, loginRequired}) {
           />
           <Stack.Screen
             name={rootSwitch.auth}
-            component={SUPPORT_DIGITS_PLUGIN ? AuthDigitsStack : AuthStack}
+            component={AuthStack}
           />
         </>
       )}
