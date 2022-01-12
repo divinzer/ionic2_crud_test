@@ -11,6 +11,7 @@ type Props = {
 };
 const ProductItem = (props: Props) => {
   const {type, item, ...rest} = props;
+  console.log('item', item);
   if (!item || !item.id) {
     return null;
   }

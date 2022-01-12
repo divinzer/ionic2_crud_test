@@ -1,6 +1,5 @@
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import {tokenSelector} from './selectors';
 
 export const loginWithEmail = ({username, password}) =>
   auth().signInWithEmailAndPassword(username, password);
@@ -9,10 +8,18 @@ export const logout = () => auth().get(`/v1/logout`);
 export const isLogin = () => auth().get(`/v1/current`);
 
 export const fetchChecklist = async () => {
-  // const idTokenResult = await auth().currentUser.getIdTokenResult();
-  console.log('id', auth().currentUser);
-  const userId = tokenSelector();
-  // return firestore().collection('checkList').doc(idTokenResult.token).get();
-  return firestore().collection('checkList').doc(userId).get();
+  const user = await auth().currentUser;
+  console.log('user', user);
+  // console.log('return', firestore().collection('checklist').doc('checkItems').get());
+  firestore()
+    .collection('checklist')
+    .doc('checkItems')
+    .get()
+    .onSnapshot(documentSnapshot => {
+      console.log('User data: ', documentSnapshot.data());
+      return documentSnapshot.data();
+    });
+  // return firestore().collection('Users').doc(user.user.id).set();
 };
-export const fetchWeeklyCheck = () => firestore().collection('weeklyCheck');
+export const fetchWeeklyCheck = () =>
+  firestore().collection('weeklyCheck').get();

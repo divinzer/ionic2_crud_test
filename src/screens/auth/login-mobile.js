@@ -184,7 +184,7 @@ class LoginMobile extends React.Component {
                       style={changeColor(theme.colors.error)}
                     />
                   ) : null}
-                  <InputMobile
+                  {/* <InputMobile
                     value={phone_number}
                     initialCountry={INITIAL_COUNTRY}
                     onChangePhoneNumber={({value, code, isoCode}) =>
@@ -195,7 +195,7 @@ class LoginMobile extends React.Component {
                       })
                     }
                     error={errors && errors.phone_number}
-                  />
+                  /> */}
                   <Button
                     title={t('common:text_signin')}
                     containerStyle={styles.button}

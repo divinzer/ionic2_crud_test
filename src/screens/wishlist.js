@@ -1,4 +1,5 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
+import auth from '@react-native-firebase/auth';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 // import isEqual from 'lodash/isEqual';
@@ -39,12 +40,25 @@ export default function WishListScreen() {
   // componentDidMount() {
   //   this.fetchData();
   // }
-  const subtitle = '위생점검 리스트';
+  // Set an initializing state whilst Firebase connects
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
 
-  const fetchData = () => dispatch(fetchChecklist(token));
+  // Handle user state changes
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
 
   useEffect(() => {
-    console.log('wtoken', token);
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
+  const subtitle = '위생점검 리스트';
+
+  const fetchData = () => dispatch(fetchWeeklyCheck());
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -57,7 +71,8 @@ export default function WishListScreen() {
   };
 
   const renderData = data => {
-    if (!data || data.length < 1) {
+    console.log('data', data);
+    if (!user) {
       return (
         <Empty
           icon="heart"
@@ -72,7 +87,7 @@ export default function WishListScreen() {
       <SwipeListView
         useFlatList
         keyExtractor={item => `${item.id}`}
-        data={checkList}
+        data={weeklyCheck}
         renderItem={({item, index}) => (
           <ProductItem
             item={item}
@@ -106,7 +121,7 @@ export default function WishListScreen() {
           <ActivityIndicator size="small" />
         </View>
       ) : (
-        renderData(checkList)
+        renderData(weeklyCheck)
       )}
     </ThemedView>
   );

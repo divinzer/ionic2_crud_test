@@ -24,17 +24,17 @@ const Tabbar = props => {
     //   isShow: true,
     // },
     {
-      iconName: 'search',
-      name: t('common:text_shop'),
-      router: homeTabs.shop,
-      isShow: true,
-    },
-    {
       iconName: 'heart',
       name: t('common:text_wishList'),
       nameData: 'wishList',
       router: homeTabs.wish_list,
       isShow: configs.get('toggleWishlist'),
+    },
+    {
+      iconName: 'search',
+      name: t('common:text_shop'),
+      router: homeTabs.shop,
+      isShow: true,
     },
     {
       iconName: 'shopping-bag',

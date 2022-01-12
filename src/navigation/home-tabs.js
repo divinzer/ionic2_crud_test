@@ -22,13 +22,13 @@ export default function HomeTabs() {
         options={{headerShown: false}}
       /> */}
       <Tab.Screen
-        name={homeTabs.shop}
-        component={Category}
+        name={homeTabs.wish_list}
+        component={Wishlist}
         options={{headerShown: false}}
       />
       <Tab.Screen
-        name={homeTabs.wish_list}
-        component={Wishlist}
+        name={homeTabs.shop}
+        component={Category}
         options={{headerShown: false}}
       />
       <Tab.Screen
