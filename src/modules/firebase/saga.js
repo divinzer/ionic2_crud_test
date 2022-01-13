@@ -1,4 +1,4 @@
-import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import {put, call, select, takeEvery} from 'redux-saga/effects';
 import {LoginManager} from 'react-native-fbsdk';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -113,12 +113,16 @@ function* fetchCheckListSaga() {
  */
 function* fetchweeklyListSaga() {
   try {
-    const data = yield call(fetchWeeklyCheck);
+    let ref = firestore().collection('weeklyCheck');
+    const snapShot = yield call(ref.get);
+    let list = [];
+    snapShot.forEach(doc => {
+      list.push(doc.data());
+    });
     yield put({
       type: Actions.FETCH_WEEKLY_CHECK_SUCCESS,
-      payload: data,
+      payload: list,
     });
-    console.log('done', data);
   } catch (error) {
     yield put({
       type: Actions.FETCH_WEEKLY_CHECK_ERROR,

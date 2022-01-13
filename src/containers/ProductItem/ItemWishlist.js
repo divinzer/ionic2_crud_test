@@ -5,8 +5,8 @@ import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import unescape from 'lodash/unescape';
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
-import {Image, Text, Button, ThemeConsumer} from 'src/components';
-import Price from '../Price';
+import {Icon, Text, Button, ThemeConsumer} from 'src/components';
+
 
 import {configsSelector} from 'src/modules/common/selectors';
 import {mainStack} from 'src/config/navigator';
@@ -15,7 +15,7 @@ import {withAddToCart} from 'src/hoc/hoc-add-to-card';
 import {SIMPLE} from 'src/config/product';
 import {padding, margin} from 'src/components/config/spacing';
 import {sizes} from 'src/components/config/fonts';
-import {white, black} from 'src/components/config/colors';
+import {white, black, orange, grey4} from 'src/components/config/colors';
 
 const stockStatusList = ['instock', 'onbackorder'];
 
@@ -23,11 +23,11 @@ const ItemWishlist = React.memo(props => {
   const {t} = useTranslation();
   const navigation = useNavigation();
   const {item, style, configs, loading, addCart} = props;
-  const {name, images, price_format, type, id, purchasable, stock_status} =
+  const {weekName, type, id, purchasable, stock_status} =
     item;
   const goProductDetail = () =>
-    navigation.navigate(mainStack.product, {
-      product: item,
+    navigation.navigate(mainStack.check_list, {
+      item,
     });
 
   const getAddToCart = () => addCart(id);
@@ -45,7 +45,7 @@ const ItemWishlist = React.memo(props => {
               style && style,
             ]}
             onPress={goProductDetail}>
-            <Image
+            {/* <Image
               source={
                 images && images[0]
                   ? {uri: images[0].src, cache: 'reload'}
@@ -53,15 +53,34 @@ const ItemWishlist = React.memo(props => {
               }
               resizeMode="stretch"
               style={styles.image}
-            />
+            /> */}
             <View style={[styles.right, styles.col]}>
               <View style={[styles.info, styles.row]}>
                 <Text colorSecondary style={[styles.textName, styles.col]}>
-                  {unescape(name)}
+                  {unescape(weekName)}
                 </Text>
-                <Price price_format={price_format} type={type} />
+                {/* <Price price_format={price_format} type={type} /> */}
+                <Icon
+                  size={19}
+                  type="font-awesome"
+                  name={'exclamation-circle'}
+                  color={'orange'}
+                  // onPress={wishListAction}
+                  underlayColor={'transparent'}
+                  // style={{marginRight: 100}}
+                />
+                <Text style={{marginRight:20}}></Text>
+                <Icon
+                  size={19}
+                  type="font-awesome"
+                  name={'pencil'}
+                  color={'grey4'}
+                  // onPress={wishListAction}
+                  underlayColor={'transparent'}
+                  // style={{marginRight: 10}}
+                />
               </View>
-              {type !== SIMPLE ||
+              {/* {type !== SIMPLE ||
               (type === SIMPLE &&
                 stockStatusList.includes(stock_status) &&
                 purchasable &&
@@ -74,7 +93,7 @@ const ItemWishlist = React.memo(props => {
                   loading={loading}
                   onPress={type === SIMPLE ? getAddToCart : goProductDetail}
                 />
-              ) : null}
+              ) : null} */}
             </View>
           </TouchableOpacity>
         </View>

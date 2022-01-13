@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 // import isEqual from 'lodash/isEqual';
@@ -13,30 +14,32 @@ import {TextHeader, CartIcon} from 'src/containers/HeaderComponent';
 import Empty from 'src/containers/Empty';
 import ButtonSwiper from 'src/containers/ButtonSwiper';
 
-import {fetchChecklist, fetchWeeklyCheck} from 'src/modules/firebase/actions';
+// import {fetchChecklist, fetchWeeklyCheck} from 'src/modules/firebase/actions';
 
-import {
-  loadingListSelector,
-  checkListSelector,
-  weeklyCheckSelector,
-  tokenSelector,
-} from 'src/modules/firebase/selectors';
+// import {
+//   loadingListSelector,
+//   checkListSelector,
+//   weeklyCheckSelector,
+//   tokenSelector,
+// } from 'src/modules/firebase/selectors';
 
 import {margin} from 'src/components/config/spacing';
-import {homeTabs} from 'src/config/navigator';
+import {mainStack} from '../config/navigator';
 
-const stateSelector = createStructuredSelector({
-  loading: loadingListSelector(),
-  checkList: checkListSelector(),
-  weeklyCheck: weeklyCheckSelector(),
-  token: tokenSelector(),
-});
+// const stateSelector = createStructuredSelector({
+//   loading: loadingListSelector(),
+//   checkList: checkListSelector(),
+//   weeklyCheck: weeklyCheckSelector(),
+//   token: tokenSelector(),
+// });
 
 export default function WishListScreen() {
   const navigation = useNavigation();
   const {t} = useTranslation();
   const dispatch = useDispatch();
-  const {loading, checkList, weeklyCheck, token} = useSelector(stateSelector);
+  const [loading, setLoading] = useState(false);
+  const [list, setList] = useState();
+  // const {loading, checkList, weeklyCheck, token} = useSelector(stateSelector);
   // componentDidMount() {
   //   this.fetchData();
   // }
@@ -54,9 +57,33 @@ export default function WishListScreen() {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
   }, []);
-  const subtitle = '위생점검 리스트';
 
-  const fetchData = () => dispatch(fetchWeeklyCheck());
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      let arr = [];
+      const ref = firestore()
+        .collection('weeklyCheck')
+        .orderBy('writtenAt', 'desc');
+        // .where('isDeleted', '==', false);
+      await ref.onSnapshot(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          const {weekName, ketchenMemo, writtenAt} = doc.data();
+          arr.push({
+            id: doc.id,
+            weekName,
+            ketchenMemo,
+            writtenAt,
+          });
+        });
+        setList(arr);
+        console.log('arr', arr);
+        setLoading(false);
+      });
+    } catch (error) {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -71,14 +98,13 @@ export default function WishListScreen() {
   };
 
   const renderData = data => {
-    if (!user) {
+    if (!data) {
       return (
         <Empty
           icon="heart"
           title={t('empty:text_title_wishlist')}
-          subTitle={t('empty:text_subtitle_wishlist')}
           titleButton={t('common:text_go_shopping')}
-          clickButton={() => navigation.navigate(homeTabs.shop)}
+          clickButton={() => navigation.navigate(mainStack.check_list)}
         />
       );
     }
@@ -86,7 +112,7 @@ export default function WishListScreen() {
       <SwipeListView
         useFlatList
         keyExtractor={item => `${item.id}`}
-        data={weeklyCheck}
+        data={data}
         renderItem={({item, index}) => (
           <ProductItem
             item={item}
@@ -101,8 +127,8 @@ export default function WishListScreen() {
         )}
         leftOpenValue={70}
         rightOpenValue={-70}
-        disableLeftSwipe={true}
-        disableRightSwipe={false}
+        disableLeftSwipe={false}
+        disableRightSwipe={true}
       />
     );
   };
@@ -111,7 +137,7 @@ export default function WishListScreen() {
     <ThemedView style={styles.container}>
       <Header
         centerComponent={
-          <TextHeader title={t('common:text_wishList')} subtitle={subtitle} />
+          <TextHeader title={'위생점검 리스트'} />
         }
         rightComponent={<CartIcon />}
       />
@@ -120,7 +146,7 @@ export default function WishListScreen() {
           <ActivityIndicator size="small" />
         </View>
       ) : (
-        renderData(weeklyCheck.data)
+        renderData(list)
       )}
     </ThemedView>
   );

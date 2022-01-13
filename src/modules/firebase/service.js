@@ -21,8 +21,8 @@ export const fetchChecklist = async () => {
     });
   // return firestore().collection('Users').doc(user.user.id).set();
 };
-export const fetchWeeklyCheck = async () => {
-  const ref = await firestore().collection('weeklyCheck');
+export const fetchWeeklyCheck = () => {
+  const ref = firestore().collection('weeklyCheck');
   ref.onSnapshot(querySnapshot => {
     const list = [];
     querySnapshot.forEach(doc => {

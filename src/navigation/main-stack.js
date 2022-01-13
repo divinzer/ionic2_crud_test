@@ -5,6 +5,7 @@ import {mainStack} from 'src/config/navigator';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import HomeTabs from './home-tabs';
+import CheckListScreen from 'src/screens/check-list';
 import Blogs from 'src/screens/blog/blogs';
 import Blog from 'src/screens/blog/blog';
 import Checkout from 'src/screens/cart/checkout';
@@ -58,12 +59,12 @@ function MainStack() {
         name={mainStack.home_tab}
         component={HomeTabs}
       />
-      {/* <Stack.Screen
-        options={{headerShown: false}}
-        name={mainStack.blogs}
-        component={Blogs}
-      />
       <Stack.Screen
+        options={{headerShown: false}}
+        name={mainStack.check_list}
+        component={CheckListScreen}
+      />
+      {/*<Stack.Screen
         options={{headerShown: false}}
         name={mainStack.blog}
         component={Blog}
