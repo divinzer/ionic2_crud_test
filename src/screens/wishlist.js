@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useTranslation} from 'react-i18next';
@@ -6,7 +6,7 @@ import {useNavigation} from '@react-navigation/native';
 // import isEqual from 'lodash/isEqual';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
-import {StyleSheet, View, ActivityIndicator, I18nManager} from 'react-native';
+import {StyleSheet, View, ActivityIndicator, RefreshControl} from 'react-native';
 import {Header, ThemedView} from 'src/components';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import ProductItem from 'src/containers/ProductItem';
@@ -33,7 +33,7 @@ import {mainStack} from '../config/navigator';
 //   token: tokenSelector(),
 // });
 
-export default function WishListScreen() {
+const WishListScreen = () => {
   const navigation = useNavigation();
   const {t} = useTranslation();
   const dispatch = useDispatch();
@@ -46,12 +46,20 @@ export default function WishListScreen() {
   // Set an initializing state whilst Firebase connects
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  const [refreshing, setRefreshing] = useState(false);
 
   // Handle user state changes
   function onAuthStateChanged(user) {
     setUser(user);
     if (initializing) setInitializing(false);
   }
+
+  // refreshing
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    fetchData();
+    setRefreshing(false);
+  }, [refreshing]);
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
@@ -113,6 +121,9 @@ export default function WishListScreen() {
         useFlatList
         keyExtractor={item => `${item.id}`}
         data={data}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         renderItem={({item, index}) => (
           <ProductItem
             item={item}
@@ -136,9 +147,7 @@ export default function WishListScreen() {
   return (
     <ThemedView style={styles.container}>
       <Header
-        centerComponent={
-          <TextHeader title={'위생점검 리스트'} />
-        }
+        centerComponent={<TextHeader title={'위생점검 리스트'} />}
         rightComponent={<CartIcon />}
       />
       {loading ? (
@@ -150,7 +159,7 @@ export default function WishListScreen() {
       )}
     </ThemedView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -170,11 +179,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// const mapStateToProps = state => ({
-//   data: dataWishListSelector(state).toJS(),
-//   loading: loadingWishListSelector(state),
-//   wishList: wishListSelector(state).toJS(),
-//   countWishlist: countWishListSelector(state),
-// });
-
-// export default connect(mapStateToProps)(withTranslation()(WishListScreen));
+export default WishListScreen;

@@ -52,7 +52,7 @@ const CheckBox = props => {
         ])}>
         {!iconRight && <CheckBoxIcon {...props} checkedColor={checkedColor} />}
 
-        {React.isValidElement(title)
+        {/* {React.isValidElement(title)
           ? title
           : title && (
               <TextElement
@@ -67,7 +67,7 @@ const CheckBox = props => {
               </TextElement>
             )}
 
-        {iconRight && <CheckBoxIcon {...props} checkedColor={checkedColor} />}
+        {iconRight && <CheckBoxIcon {...props} checkedColor={checkedColor} />} */}
       </View>
     </Component>
   );
@@ -108,10 +108,10 @@ const styles = {
     alignItems: 'center',
   },
   container: {
-    margin: 5,
-    marginLeft: 10,
-    marginRight: 10,
-    padding: 10,
+    // margin: 5,
+    // marginLeft: 10,
+    // marginRight: 10,
+    // padding: 10,
   },
   containerHasTitle: {
     borderWidth: 1,

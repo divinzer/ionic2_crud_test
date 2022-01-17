@@ -17,7 +17,7 @@ const Icon = props => {
     type,
     name,
     size,
-    color,
+    color = 'black',
     iconStyle,
     underlayColor,
     reverse,

@@ -69,12 +69,12 @@ const ItemWishlist = React.memo(props => {
                   underlayColor={'transparent'}
                   // style={{marginRight: 100}}
                 />
-                <Text style={{marginRight:20}}></Text>
+                <Text style={{marginRight: 20}} />
                 <Icon
                   size={19}
                   type="font-awesome"
                   name={'pencil'}
-                  color={'grey4'}
+                  color={grey4}
                   // onPress={wishListAction}
                   underlayColor={'transparent'}
                   // style={{marginRight: 10}}
