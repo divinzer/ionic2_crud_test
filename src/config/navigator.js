@@ -21,7 +21,7 @@ export const mainStack = {
   home_tab: 'HomeTab',
   wish_list: 'WishListStack',
   check_list: 'CheckListStack',
-  blogs: 'BlogsScreen',
+  feedback: 'FeedbackScreen',
   blog: 'BlogScreen',
 
   checkout: 'CheckOutScreen',

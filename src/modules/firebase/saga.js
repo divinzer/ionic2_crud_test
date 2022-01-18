@@ -93,46 +93,46 @@ function* signOutSaga() {
  * Fetch fetchChecklist saga
  * @returns {IterableIterator<*>}
  */
-function* fetchCheckListSaga() {
-  try {
-    const data = yield call(fetchChecklist);
-    yield put({
-      type: Actions.FETCH_CHECK_LIST_SUCCESS,
-      payload: data,
-    });
-  } catch (error) {
-    yield put({
-      type: Actions.FETCH_CHECK_LIST_ERROR,
-    });
-  }
-}
+// function* fetchCheckListSaga() {
+//   try {
+//     const data = yield call(fetchChecklist);
+//     yield put({
+//       type: Actions.FETCH_CHECK_LIST_SUCCESS,
+//       payload: data,
+//     });
+//   } catch (error) {
+//     yield put({
+//       type: Actions.FETCH_CHECK_LIST_ERROR,
+//     });
+//   }
+// }
 
 /**
  * Fetch pfetchWeeklyCheck saga
  * @returns {IterableIterator<*>}
  */
-function* fetchweeklyListSaga() {
-  try {
-    let ref = firestore().collection('weeklyCheck');
-    const snapShot = yield call(ref.get);
-    let list = [];
-    snapShot.forEach(doc => {
-      list.push(doc.data());
-    });
-    yield put({
-      type: Actions.FETCH_WEEKLY_CHECK_SUCCESS,
-      payload: list,
-    });
-  } catch (error) {
-    yield put({
-      type: Actions.FETCH_WEEKLY_CHECK_ERROR,
-    });
-  }
-}
+// function* fetchweeklyListSaga() {
+//   try {
+//     let ref = firestore().collection('weeklyCheck');
+//     const snapShot = yield call(ref.get);
+//     let list = [];
+//     snapShot.forEach(doc => {
+//       list.push(doc.data());
+//     });
+//     yield put({
+//       type: Actions.FETCH_WEEKLY_CHECK_SUCCESS,
+//       payload: list,
+//     });
+//   } catch (error) {
+//     yield put({
+//       type: Actions.FETCH_WEEKLY_CHECK_ERROR,
+//     });
+//   }
+// }
 
 export default function* firebaseSaga() {
   yield takeEvery(Actions.SIGN_IN_WITH_FIREBASE, signInWithEmailSaga);
   yield takeEvery(Actions.SIGN_OUT, signOutSaga);
-  yield takeEvery(Actions.FETCH_CHECK_LIST, fetchCheckListSaga);
-  yield takeEvery(Actions.FETCH_WEEKLY_CHECK, fetchweeklyListSaga);
+  // yield takeEvery(Actions.FETCH_CHECK_LIST, fetchCheckListSaga);
+  // yield takeEvery(Actions.FETCH_WEEKLY_CHECK, fetchweeklyListSaga);
 }

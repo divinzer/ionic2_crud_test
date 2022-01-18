@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 // import isEqual from 'lodash/isEqual';
 import {createStructuredSelector} from 'reselect';
@@ -13,11 +14,7 @@ import {TextHeader, CartIcon} from 'src/containers/HeaderComponent';
 import Empty from 'src/containers/Empty';
 import ButtonSwiper from 'src/containers/ButtonSwiper';
 
-import {
-  FETCH_WEEKLY_CHECK,
-  FETCH_WEEKLY_CHECK_SUCCESS,
-  FETCH_WEEKLY_CHECK_ERROR,
-} from 'src/modules/firebase/constants';
+import {FETCH_WEEKLY_CHECK, FETCH_WEEKLY_CHECK_SUCCESS, FETCH_WEEKLY_CHECK_ERROR} from 'src/modules/firebase/constants';
 
 import {
   loadingListSelector,
@@ -34,8 +31,14 @@ const stateSelector = createStructuredSelector({
 
 const WishListScreen = () => {
   const navigation = useNavigation();
+  const {t} = useTranslation();
   const dispatch = useDispatch();
-  const {loading, weeklyCheck} = useSelector(stateSelector);
+  const [loading, setLoading] = useState(false);
+  const [list, setList] = useState();
+  // const {loading, checkList, weeklyCheck, token} = useSelector(stateSelector);
+  // componentDidMount() {
+  //   this.fetchData();
+  // }
   // Set an initializing state whilst Firebase connects
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
@@ -60,33 +63,29 @@ const WishListScreen = () => {
   }, []);
 
   const fetchData = async () => {
-    dispatch({type: FETCH_WEEKLY_CHECK});
-
     try {
+      setLoading(true);
       let arr = [];
       const ref = firestore()
         .collection('weeklyCheck')
-        .where('isDeleted', '==', false)
-        .orderBy('writtenAt', 'desc')
-        .limit(10);
+        .orderBy('writtenAt', 'desc');
+        // .where('isDeleted', '==', false);
       await ref.onSnapshot(querySnapshot => {
-        querySnapshot &&
-          querySnapshot.forEach(doc => {
-            console.log('q', querySnapshot);
-            const {weekName, ketchenMemo, writtenAt} = doc.data();
-            arr.push({
-              id: doc.id,
-              weekName,
-              ketchenMemo,
-              writtenAt,
-            });
+        querySnapshot.forEach(doc => {
+          const {weekName, ketchenMemo, writtenAt} = doc.data();
+          arr.push({
+            id: doc.id,
+            weekName,
+            ketchenMemo,
+            writtenAt,
           });
-          // console.log('arr', arr);
-        dispatch({type: FETCH_WEEKLY_CHECK_SUCCESS, payload: arr});
+        });
+        setList(arr);
+        console.log('arr', arr);
+        setLoading(false);
       });
-    } catch (e) {
-      dispatch({type: FETCH_WEEKLY_CHECK_ERROR, payload: e});
-      // setLoading(false);
+    } catch (error) {
+      setLoading(false);
     }
   };
 
@@ -152,7 +151,7 @@ const WishListScreen = () => {
           <ActivityIndicator size="small" />
         </View>
       ) : (
-        renderData(weeklyCheck)
+        renderData(list)
       )}
     </ThemedView>
   );

@@ -1,127 +1,122 @@
 import React, {useState, useEffect} from 'react';
 import firestore from '@react-native-firebase/firestore';
-import {useNavigation} from '@react-navigation/native';
+import {createStructuredSelector} from 'reselect';
+import {useSelector, useDispatch} from 'react-redux';
 import sortBy from 'lodash/sortBy';
-import truncate from 'lodash/truncate';
-import {Switch} from 'react-native';
-import unescape from 'lodash/unescape';
 import {StyleSheet, FlatList, View} from 'react-native';
 import {Row, Col} from 'src/containers/Gird';
 import {Header, Icon, ThemedView, Text} from 'src/components';
 import CheckListItem from './check-list-item';
 import {TextHeader, CartIcon, IconHeader} from 'src/containers/HeaderComponent';
-import Container from 'src/containers/Container';
 import {grey4, grey6} from 'src/components/config/colors';
-import {mainStack} from 'src/config/navigator';
+
+// import {fetchChecklist} from 'src/modules/firebase/actions';
+import {FETCH_CHECK_LIST, FETCH_CHECK_LIST_SUCCESS, FETCH_CHECK_LIST_ERROR} from 'src/modules/firebase/constants';
+
+import {
+  loadingListSelector,
+  checkListSelector,
+} from 'src/modules/firebase/selectors';
+
+const stateSelector = createStructuredSelector({
+  loading: loadingListSelector(),
+  checkList: checkListSelector(),
+});
 
 import {margin, padding} from 'src/components/config/spacing';
 
 const CheckListScreen = props => {
-  const navigation = useNavigation();
   const {route} = props;
+  const dispatch = useDispatch();
+  const {loading, checkList} = useSelector(stateSelector);
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   let arr0 = [];
   let arr1 = [];
   let arr2 = [];
   let total = [];
+
   const onChecked = ck => {
-    console.log('ck', data);
     data.forEach((item, i) => {
       if (item.checkName === ck) {
-        console.log('i', i);
-        item.checked = !item.checked;
-        setData(data[i].checked = item.checked)
+        data[i].checked = !item.checked;
+        setData([...data]);
       }
     });
-    // console.log('t', total);
-    // total[i] = !total[i];
   };
-  // console.log('aaa', route.params);
+
+  const getCheckList = product_id => {
+    dispatch(removeWishList(product_id));
+  };
 
   const fetchKitchenList = async () => {
+    console.log('run kitchen');
     try {
-      setLoading(true);
-      const getKitchen = subSnapshot => {
-        // console.log('sub', subSnapshot.collection('kitchen'));
-        return subSnapshot.get('kitchen');
-      };
+      // setLoading(true);
+      let idx = [];
       const ref = firestore()
         .collection('weeklyCheck')
         .doc(route.params.item.id)
         .collection('kitchen');
       // console.log('ref', ref);
       await ref.get().then(documentSnapshot => {
-        // console.log('C data: ', documentSnapshot.docs[0].data()['개인위생']);
-        // console.log('D', documentSnapshot.docs[0].data()['개인위생']);
         // chkeck in checked
         for (const item in documentSnapshot.docs[0].data()['개인위생']) {
           let value = documentSnapshot.docs[0].data()['개인위생'][item];
-          // console.log('value', value);
-          if (value === true || false) {
-            total.find(v => {
-              if (v.checkName === item) {
-                return (v.checked = value);
-              }
-            });
+          console.log('value', value);
+          if (value === true) {
+            idx.push(total.findIndex(v => v.checkName === item));
           }
         }
 
         for (const item in documentSnapshot.docs[0].data()['식재관리']) {
           let value = documentSnapshot.docs[0].data()['식재관리'][item];
-          // console.log('value', value);
-          if (value === true || false) {
-            total.find(v => {
-              if (v.checkName === item) {
-                return (v.checked = value);
-              }
-            });
+          console.log('value2', value);
+          if (value === true) {
+            idx.push(total.findIndex(v => v.checkName === item));
           }
         }
 
         for (const item in documentSnapshot.docs[0].data()['조리장위생']) {
           let value = documentSnapshot.docs[0].data()['조리장위생'][item];
-          // console.log('value', value);
-          if (value === true || false) {
-            total.find(v => {
-              if (v.checkName === item) {
-                return (v.checked = value);
-              }
-            });
+          console.log('value3', value);
+          if (value === true) {
+            idx.push(total.findIndex(v => v.checkName === item));
           }
         }
 
-        // setData(newTotal);
-
         return documentSnapshot;
       });
-      setLoading(false);
+      console.log('idx', idx);
+      // idx.map(i => {
+      //   total[i].checked = true;
+      // });
+      console.log('data', data);
+      // setData(newTotal);
+      // setLoading(false);
     } catch (error) {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
   const fetchCheckList = async () => {
+    dispatch({type: FETCH_CHECK_LIST});
     try {
-      setLoading(true);
+      // setLoading(true);
       const ref = firestore().collection('checklist').doc('checkItems');
-        // .where('isDeleted', '==', false);
       await ref.onSnapshot(documentSnapshot => {
-        // console.log('User data: ', documentSnapshot.data());
         for (const item in documentSnapshot.data()['개인위생']) {
           let value = documentSnapshot.data()['개인위생'][item];
-          // console.log('test', item.replace('hygiene', ''));
           arr0.push({
             checkName: item,
             value: value,
             checked: false,
           });
         }
-        // setPeosonal(sortBy(arr0, ['checkName'.replace('hygiene', '')]));
         arr0 = sortBy(arr0, function (o) {
           return Number(o.checkName.replace('hygiene', ''));
         });
-        // console.log('test2', personal);
+
         for (const item in documentSnapshot.data()['식재관리']) {
           let value = documentSnapshot.data()['식재관리'][item];
           arr1.push({
@@ -129,11 +124,8 @@ const CheckListScreen = props => {
             value: value,
             checked: false,
           });
-          // console.log('arr1', arr1);
         }
-        // documentSnapshot.data()['개인위생'].forEach(doc => {
-        //   console.log('doc', doc);
-        // })
+
         arr1 = sortBy(arr1, function (o) {
           return Number(o.checkName.replace('ingredient', ''));
         });
@@ -154,14 +146,17 @@ const CheckListScreen = props => {
         total = arr0.concat(arr1, arr2);
         // console.log('1', arr0, '2', arr1);
         setData(total);
+        dispatch({type: FETCH_CHECK_LIST_SUCCESS, payload: total});
       });
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
+      // setLoading(false);
+    } catch (e) {
+      dispatch({type: FETCH_CHECK_LIST_SUCCESS, payload: e});
+      // setLoading(false);
     }
   };
 
   useEffect(() => {
+    console.log('run check list');
     fetchCheckList();
     fetchKitchenList();
   }, []);
@@ -228,9 +223,9 @@ const CheckListScreen = props => {
       return (
         <CheckListItem
           data={item}
-          // onPress={() => navigation.navigate(mainStack.notification_detail)}
+          setData={setData}
           style={{height: 30}}
-          onChecked={()=>onChecked(item.checkName)}
+          onChecked={() => onChecked(item.checkName)}
         />
       );
     }

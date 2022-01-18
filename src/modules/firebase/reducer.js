@@ -11,19 +11,12 @@ const initError = {
 
 export const initState = {
   isLogin: false,
-  pending: false,
+  loading: false,
   user: {},
   token: '',
-  loginError: initError,
-  checkList: {
-    data: [],
-    loading: false,
-    expire: '',
-  },
-  weeklyCheck: {
-    data: [],
-    loading: false,
-  },
+  error: initError,
+  checkList: [],
+  weeklyCheck: [],
 };
 
 /**
@@ -37,46 +30,63 @@ const firebaseReducer = produce((draft, action) => {
   switch (type) {
     // auth
     case Actions.SIGN_IN_WITH_FIREBASE:
-      draft.pending = true;
-      draft.loginError = initError;
+      draft.loading = true;
+      draft.error = initError;
       break;
     case Actions.SIGN_IN_WITH_FIREBASE_SUCCESS:
-      draft.pending = false;
+      draft.loading = false;
       draft.user = payload.user;
       draft.isLogin = true;
       draft.token = payload.token;
       break;
     case Actions.SIGN_IN_WITH_FIREBASE_ERROR:
       const errorSignIn = notificationMessage(payload);
-      draft.pending = false;
-      draft.loginError = errorSignIn;
+      draft.loading = false;
+      draft.error = errorSignIn;
       break;
     // sign out
     case Actions.SIGN_OUT_SUCCESS:
       draft = initState;
+      draft.error = initError;
       break;
     // Check List
     case Actions.FETCH_CHECK_LIST:
-      draft.checkList.loading = true;
+      draft.loading = true;
+      draft.error = initError;
       break;
     case Actions.FETCH_CHECK_LIST_SUCCESS:
-      draft.checkList.data = payload;
-      draft.checkList.loading = false;
+      draft.checkList = payload;
+      draft.loading = false;
       break;
     case Actions.FETCH_CHECK_LIST_ERROR:
-      draft.checkList.loading = false;
+      draft.loading = false;
+      draft.error = notificationMessage(payload);
       break;
-
+    // Check
+    case Actions.FETCH_CHECK:
+      draft.loading = true;
+      draft.error = initError;
+      break;
+    case Actions.FETCH_CHECK_SUCCESS:
+      draft.checkList = payload;
+      draft.loading = false;
+      break;
+    case Actions.FETCH_CHECK_ERROR:
+      draft.loading = false;
+      draft.error = notificationMessage(payload);
+      break;
     // Weekly Check
     case Actions.FETCH_WEEKLY_CHECK:
-      draft.weeklyCheck.loading = true;
+      draft.loading = true;
+      draft.error = initError;
       break;
     case Actions.FETCH_WEEKLY_CHECK_SUCCESS:
-      draft.weeklyCheck.data = payload;
-      draft.weeklyCheck.loading = false;
+      draft.weeklyCheck = payload;
+      draft.loading = false;
       break;
     case Actions.FETCH_WEEKLY_CHECK_ERROR:
-      draft.weeklyCheck.loading = false;
+      draft.loading = false;
+      draft.error = notificationMessage(payload);
       break;
     case REHYDRATE:
       if (payload && payload.auth) {

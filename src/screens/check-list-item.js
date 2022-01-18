@@ -1,13 +1,21 @@
-import React, {useState} from 'react';
-import {StyleSheet} from 'react-native';
-import {withTheme, Avatar, Text} from 'src/components';
+import React from 'react';
+import {StyleSheet, TouchableOpacity} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {withTheme, Text} from 'src/components';
 import {Row, Col} from 'src/containers/Gird';
 import Container from 'src/containers/Container';
 import CheckBox from 'src/components/checkbox/CheckBox';
 
 import {margin, padding} from 'src/components/config/spacing';
+import {mainStack} from 'src/config/navigator';
 
 const CheckListItem = ({data, theme, onChecked}) => {
+  const navigation = useNavigation();
+  const goFeedback = () =>
+    navigation.navigate(mainStack.feedback, {
+      data,
+    });
+
   if (!data) {
     return null;
   }
@@ -19,13 +27,15 @@ const CheckListItem = ({data, theme, onChecked}) => {
           borderColor: theme.colors.border,
         },
       ]}>
-      <Row style={styles.row}>
-        <Col style={styles.center}>
-          <Text medium>{data.value}</Text>
-        </Col>
-        {/* <CheckBox colorThird style={styles.textCreateAt} theme={theme} /> */}
-        <CheckBox colorThird onPress={onChecked} checked={data.checked} />
-      </Row>
+      <TouchableOpacity onPress={goFeedback}>
+        <Row style={styles.row}>
+          <Col style={styles.center}>
+            <Text medium>{data.value}</Text>
+          </Col>
+          {/* <CheckBox colorThird style={styles.textCreateAt} theme={theme} /> */}
+          <CheckBox colorThird onPress={onChecked} checked={data.checked} />
+        </Row>
+      </TouchableOpacity>
     </Container>
   );
 };

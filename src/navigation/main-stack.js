@@ -6,7 +6,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import HomeTabs from './home-tabs';
 import CheckListScreen from 'src/screens/check-list';
-import Blogs from 'src/screens/blog/blogs';
+import FeedbackScreen from 'src/screens/feedback';
 import Blog from 'src/screens/blog/blog';
 import Checkout from 'src/screens/cart/checkout';
 // import WeViewCheckout from 'src/screens/cart/webview-checkout';
@@ -64,12 +64,12 @@ function MainStack() {
         name={mainStack.check_list}
         component={CheckListScreen}
       />
-      {/*<Stack.Screen
-        options={{headerShown: false}}
-        name={mainStack.blog}
-        component={Blog}
-      />
       <Stack.Screen
+        options={{headerShown: false}}
+        name={mainStack.feedback}
+        component={FeedbackScreen}
+      />
+      {/*<Stack.Screen
         options={{headerShown: false}}
         name={mainStack.checkout}
         component={Checkout}
