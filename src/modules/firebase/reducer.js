@@ -3,11 +3,7 @@ import {REHYDRATE} from 'redux-persist/lib/constants';
 import * as Actions from './constants';
 import {notificationMessage} from 'src/utils/error';
 
-const initError = {
-  type: 'error',
-  message: '',
-  errors: {},
-};
+const initError = '';
 
 export const initState = {
   isLogin: false,
@@ -16,6 +12,7 @@ export const initState = {
   token: '',
   error: initError,
   checkList: [],
+  check: {},
   weeklyCheck: [],
 };
 
@@ -65,13 +62,26 @@ const firebaseReducer = produce((draft, action) => {
     // Check
     case Actions.FETCH_CHECK:
       draft.loading = true;
-      draft.error = initError;
       break;
     case Actions.FETCH_CHECK_SUCCESS:
-      draft.checkList = payload;
       draft.loading = false;
+      draft.check = payload;
       break;
     case Actions.FETCH_CHECK_ERROR:
+      draft.loading = false;
+      draft.error = notificationMessage(payload);
+      break;
+    case Actions.CHANGE_CHECK_FEEDBACK:
+      console.log('pay', payload);
+      const {name, value} = payload;
+      const feedback = draft.checkList.find(list => list.checkName === name);
+      feedback.feedback = value;
+      break;
+    case Actions.CHANGE_CHECK_LIST:
+      const item = draft.checkList.find(list => list.checkName === payload);
+      item.checked = !item.checked;
+      break;
+    case Actions.CHANGE_CHECK_LIST_ERROR:
       draft.loading = false;
       draft.error = notificationMessage(payload);
       break;

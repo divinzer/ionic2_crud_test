@@ -1,17 +1,27 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
-import sortBy from 'lodash/sortBy';
+import {sortBy, merge} from 'lodash';
 import {StyleSheet, FlatList, View} from 'react-native';
 import {Row, Col} from 'src/containers/Gird';
 import {Header, Icon, ThemedView, Text} from 'src/components';
+import Input from 'src/containers/input/Input';
+import Button from 'src/containers/Button';
+import Container from 'src/containers/Container';
 import CheckListItem from './check-list-item';
 import {TextHeader, CartIcon, IconHeader} from 'src/containers/HeaderComponent';
 import {grey4, grey6} from 'src/components/config/colors';
 
 // import {fetchChecklist} from 'src/modules/firebase/actions';
-import {FETCH_CHECK_LIST, FETCH_CHECK_LIST_SUCCESS, FETCH_CHECK_LIST_ERROR} from 'src/modules/firebase/constants';
+import {
+  FETCH_CHECK_LIST,
+  FETCH_CHECK_LIST_SUCCESS,
+  FETCH_CHECK_LIST_ERROR,
+  CHANGE_CHECK_FEEDBACK,
+  CHANGE_CHECK_LIST,
+  CHANGE_CHECK_LIST_ERROR,
+} from 'src/modules/firebase/constants';
 
 import {
   loadingListSelector,
@@ -27,9 +37,9 @@ import {margin, padding} from 'src/components/config/spacing';
 
 const CheckListScreen = props => {
   const {route} = props;
+  const fId = route.params.item.id;
   const dispatch = useDispatch();
   const {loading, checkList} = useSelector(stateSelector);
-  const [data, setData] = useState([]);
   // const [loading, setLoading] = useState(false);
   let arr0 = [];
   let arr1 = [];
@@ -37,65 +47,63 @@ const CheckListScreen = props => {
   let total = [];
 
   const onChecked = ck => {
-    data.forEach((item, i) => {
-      if (item.checkName === ck) {
-        data[i].checked = !item.checked;
-        setData([...data]);
-      }
-    });
+    dispatch({type: CHANGE_CHECK_LIST, payload: ck});
   };
 
-  const getCheckList = product_id => {
+  const removeCheckList = product_id => {
     dispatch(removeWishList(product_id));
   };
 
   const fetchKitchenList = async () => {
-    console.log('run kitchen');
     try {
       // setLoading(true);
-      let idx = [];
       const ref = firestore()
         .collection('weeklyCheck')
         .doc(route.params.item.id)
         .collection('kitchen');
-      // console.log('ref', ref);
       await ref.get().then(documentSnapshot => {
+        let feedback = documentSnapshot.docs[1].data();
+        const obj = merge(
+          feedback['개인위생'],
+          feedback['식재관리'],
+          feedback['조리장위생'],
+        );
+        console.log('obj', obj);
+        for (const item in obj) {
+          console.log('item', item, obj[item]);
+          dispatch({
+            type: CHANGE_CHECK_FEEDBACK,
+            payload: {name: item, value: obj[item]},
+          });
+          console.log('run');
+        }
+
         // chkeck in checked
         for (const item in documentSnapshot.docs[0].data()['개인위생']) {
           let value = documentSnapshot.docs[0].data()['개인위생'][item];
-          console.log('value', value);
           if (value === true) {
-            idx.push(total.findIndex(v => v.checkName === item));
+            dispatch({type: CHANGE_CHECK_LIST, payload: item});
           }
         }
 
         for (const item in documentSnapshot.docs[0].data()['식재관리']) {
           let value = documentSnapshot.docs[0].data()['식재관리'][item];
-          console.log('value2', value);
           if (value === true) {
-            idx.push(total.findIndex(v => v.checkName === item));
+            dispatch({type: CHANGE_CHECK_LIST, payload: item});
           }
         }
 
         for (const item in documentSnapshot.docs[0].data()['조리장위생']) {
           let value = documentSnapshot.docs[0].data()['조리장위생'][item];
-          console.log('value3', value);
           if (value === true) {
-            idx.push(total.findIndex(v => v.checkName === item));
+            dispatch({type: CHANGE_CHECK_LIST, payload: item});
           }
         }
 
         return documentSnapshot;
       });
-      console.log('idx', idx);
-      // idx.map(i => {
-      //   total[i].checked = true;
-      // });
-      console.log('data', data);
-      // setData(newTotal);
-      // setLoading(false);
-    } catch (error) {
-      // setLoading(false);
+    } catch (e) {
+      dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
     }
   };
 
@@ -111,6 +119,7 @@ const CheckListScreen = props => {
             checkName: item,
             value: value,
             checked: false,
+            feedback: null,
           });
         }
         arr0 = sortBy(arr0, function (o) {
@@ -123,6 +132,7 @@ const CheckListScreen = props => {
             checkName: item,
             value: value,
             checked: false,
+            feedback: null,
           });
         }
 
@@ -135,95 +145,112 @@ const CheckListScreen = props => {
             checkName: item,
             value: value,
             checked: false,
+            feedback: null,
           });
         }
-        // documentSnapshot.data()['개인위생'].forEach(doc => {
-        //   console.log('doc', doc);
-        // })
         arr2 = sortBy(arr2, function (o) {
           return Number(o.checkName.replace('kitchen', ''));
         });
         total = arr0.concat(arr1, arr2);
-        // console.log('1', arr0, '2', arr1);
-        setData(total);
         dispatch({type: FETCH_CHECK_LIST_SUCCESS, payload: total});
       });
-      // setLoading(false);
     } catch (e) {
-      dispatch({type: FETCH_CHECK_LIST_SUCCESS, payload: e});
-      // setLoading(false);
+      dispatch({type: FETCH_CHECK_LIST_ERROR, payload: e});
     }
   };
 
   useEffect(() => {
-    console.log('run check list');
     fetchCheckList();
     fetchKitchenList();
   }, []);
 
   const itemNotification = ({item}) => {
-    if (loading === false && item.checkName === 'hygiene0') {
+    if (item.checkName === 'hygiene0') {
       return (
-        <Row style={styles.row}>
-          <Col>
-            <Text style={styles.textName}>키친-개인위생</Text>
-            {/* <Rating size={12} startingValue={data.rating} readonly /> */}
-          </Col>
-          <Icon
-            size={19}
-            type="font-awesome"
-            name={'plus-circle'}
-            color={grey4}
-            // onPress={wishListAction}
-            underlayColor={'transparent'}
-            containerStyle={{paddingRight: 10, paddingTop: 5}}
-            // style={{paddingRight: 100}}
+        <>
+          <Row style={styles.row}>
+            <Col>
+              <Text style={styles.textName}>키친-개인위생</Text>
+              {/* <Rating size={12} startingValue={data.rating} readonly /> */}
+            </Col>
+            <Icon
+              size={19}
+              type="font-awesome"
+              name={'plus-circle'}
+              color={grey4}
+              // onPress={wishListAction}
+              underlayColor={'transparent'}
+              containerStyle={{paddingRight: 10, paddingTop: 5}}
+              // style={{paddingRight: 100}}
+            />
+          </Row>
+          <CheckListItem
+            data={item}
+            fId={fId}
+            style={{height: 30}}
+            onChecked={() => onChecked(item.checkName)}
           />
-        </Row>
+        </>
       );
     } else if (item.checkName === 'ingredient0') {
       return (
-        <Row style={styles.row}>
-          <Col>
-            <Text style={styles.textName}>키친-식재위생</Text>
-            {/* <Rating size={12} startingValue={data.rating} readonly /> */}
-          </Col>
-          <Icon
-            size={19}
-            type="font-awesome"
-            name={'plus-circle'}
-            color={grey4}
-            // onPress={wishListAction}
-            underlayColor={'transparent'}
-            containerStyle={{paddingRight: 10, paddingTop: 5}}
-            // style={{paddingRight: 100}}
+        <>
+          <Row style={styles.row}>
+            <Col>
+              <Text style={styles.textName}>키친-식재위생</Text>
+              {/* <Rating size={12} startingValue={data.rating} readonly /> */}
+            </Col>
+            <Icon
+              size={19}
+              type="font-awesome"
+              name={'plus-circle'}
+              color={grey4}
+              // onPress={wishListAction}
+              underlayColor={'transparent'}
+              containerStyle={{paddingRight: 10, paddingTop: 5}}
+              // style={{paddingRight: 100}}
+            />
+          </Row>
+          <CheckListItem
+            data={item}
+            fId={fId}
+            style={{height: 30}}
+            onChecked={() => onChecked(item.checkName)}
           />
-        </Row>
+        </>
       );
     } else if (item.checkName === 'kitchen0') {
       return (
-        <Row style={styles.row}>
-          <Col>
-            <Text style={styles.textName}>키친-조리장위생</Text>
-            {/* <Rating size={12} startingValue={data.rating} readonly /> */}
-          </Col>
-          <Icon
-            size={19}
-            type="font-awesome"
-            name={'plus-circle'}
-            color={grey4}
-            // onPress={wishListAction}
-            underlayColor={'transparent'}
-            containerStyle={{paddingRight: 10, paddingTop: 5}}
-            // style={{paddingRight: 100}}
+        <>
+          <Row style={styles.row}>
+            <Col>
+              <Text style={styles.textName}>키친-조리장위생</Text>
+              {/* <Rating size={12} startingValue={data.rating} readonly /> */}
+            </Col>
+            <Icon
+              size={19}
+              type="font-awesome"
+              name={'plus-circle'}
+              color={grey4}
+              // onPress={wishListAction}
+              underlayColor={'transparent'}
+              containerStyle={{paddingRight: 10, paddingTop: 5}}
+              // style={{paddingRight: 100}}
+            />
+          </Row>
+          <CheckListItem
+            data={item}
+            fId={fId}
+            style={{height: 30}}
+            onChecked={() => onChecked(item.checkName)}
           />
-        </Row>
+        </>
       );
     } else {
       return (
         <CheckListItem
           data={item}
-          setData={setData}
+          fId={fId}
           style={{height: 30}}
           onChecked={() => onChecked(item.checkName)}
         />
@@ -231,6 +258,27 @@ const CheckListScreen = props => {
     }
   };
 
+  const footer = () => {
+    return (
+      <Container>
+        <View style={styles.marginBottom('small')}>
+          <Input
+            label={'피드백을 여기에 작성해 주세요.'}
+            multiline
+            numberOfLines={8}
+            value={''}
+            onChangeText={value => this.setState({review: value})}
+          />
+        </View>
+        <Button
+          loading={false}
+          title={'저장'}
+          containerStyle={styles.marginBottom('big')}
+          onPress={()=>{}}
+        />
+      </Container>
+    )
+  }
   return (
     <ThemedView isFullView>
       <Header
@@ -240,10 +288,11 @@ const CheckListScreen = props => {
         rightComponent={<CartIcon />}
       />
       <FlatList
-        data={data}
+        data={checkList}
         keyExtractor={item => `${item.checkName}`}
         renderItem={itemNotification}
         ListFooterComponentStyle={<View style={styles.footer} />}
+        ListFooterComponent={footer}
       />
     </ThemedView>
   );
@@ -289,6 +338,12 @@ const styles = StyleSheet.create({
     // width: '5%',
     paddingLeft: padding.small,
     paddingRight: padding.small,
+  },
+  marginBottom: type => ({
+    marginBottom: margin[type],
+  }),
+  footer: {
+    marginBottom: margin.large,
   },
 });
 

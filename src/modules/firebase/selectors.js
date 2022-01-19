@@ -20,7 +20,10 @@ export const userIdSelector = () =>
 export const tokenSelector = () => createSelector(firebase, data => data.token);
 
 export const loadingListSelector = () =>
-  createSelector(firebase, data => data.checkList.loading);
+  createSelector(firebase, data => data.loading);
+
+export const checkSelector = () =>
+  createSelector(firebase, data => data.check);
 
 export const checkListSelector = () =>
   createSelector(firebase, data => data.checkList);

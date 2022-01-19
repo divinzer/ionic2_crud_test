@@ -9,11 +9,12 @@ import CheckBox from 'src/components/checkbox/CheckBox';
 import {margin, padding} from 'src/components/config/spacing';
 import {mainStack} from 'src/config/navigator';
 
-const CheckListItem = ({data, theme, onChecked}) => {
+const CheckListItem = ({data, theme, onChecked, fId}) => {
   const navigation = useNavigation();
   const goFeedback = () =>
     navigation.navigate(mainStack.feedback, {
       data,
+      fId,
     });
 
   if (!data) {

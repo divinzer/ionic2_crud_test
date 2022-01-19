@@ -6,11 +6,13 @@ import {useNavigation} from '@react-navigation/native';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {StyleSheet, View, ActivityIndicator, RefreshControl} from 'react-native';
-import {Header, ThemedView} from 'src/components';
+import {Header, ThemedView, Modal} from 'src/components';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import ProductItem from 'src/containers/ProductItem';
 import {TextHeader, CartIcon} from 'src/containers/HeaderComponent';
 import Empty from 'src/containers/Empty';
+import Button from 'src/containers/Button';
+import Container from 'src/containers/Container';
 import ButtonSwiper from 'src/containers/ButtonSwiper';
 
 import {
@@ -39,6 +41,7 @@ const WishListScreen = () => {
   // Set an initializing state whilst Firebase connects
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  const [isModal, setModal] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   // Handle user state changes
@@ -68,11 +71,11 @@ const WishListScreen = () => {
         .collection('weeklyCheck')
         .where('isDeleted', '==', false)
         .orderBy('writtenAt', 'desc')
-        .limit(10);
+        .limit(8);
       await ref.onSnapshot(querySnapshot => {
         querySnapshot &&
           querySnapshot.forEach(doc => {
-            console.log('q', querySnapshot);
+            // console.log('q', querySnapshot);
             const {weekName, ketchenMemo, writtenAt} = doc.data();
             arr.push({
               id: doc.id,
@@ -154,6 +157,20 @@ const WishListScreen = () => {
       ) : (
         renderData(weeklyCheck)
       )}
+      <Container>
+        <Button
+          loading={false}
+          title={'저장'}
+          containerStyle={styles.marginBottom('big')}
+          onPress={()=>{}}
+        />
+      </Container>
+      <Modal
+        visible={isModal}
+        setModalVisible={value => setModal(value)}
+        ratioHeight={0.1}>
+        <Container />
+      </Modal>
     </ThemedView>
   );
 };
@@ -174,6 +191,9 @@ const styles = StyleSheet.create({
   firstItem: {
     borderTopWidth: 1,
   },
+  marginBottom: type => ({
+    marginBottom: margin[type],
+  }),
 });
 
 export default WishListScreen;
