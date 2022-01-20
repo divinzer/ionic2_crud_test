@@ -1,14 +1,14 @@
 // @flow
 import React from 'react';
-
+import auth from '@react-native-firebase/auth';
 import {StyleSheet, TouchableOpacity, Animated} from 'react-native';
 
 import {connect} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {ScreenProps} from 'react-native-screens';
 import {Badge, Icon} from 'src/components';
-
-import {homeTabs} from 'src/config/navigator';
+import NavigationServices from 'src/utils/navigation';
+import {rootSwitch, authStack} from 'src/config/navigator';
 
 import {countItemSelector} from 'src/modules/cart/selectors';
 import {configsSelector} from 'src/modules/common/selectors';
@@ -39,6 +39,14 @@ class CartIcon extends React.Component<Props> {
     }
   }
 
+  signOut = async () => {
+    try {
+      await auth().signOut();
+      NavigationServices.navigate(rootSwitch.auth, {screen: authStack.login});
+    } catch (e) {
+      NavigationServices.navigate(rootSwitch.auth, {screen: authStack.login});
+    }
+  };
   animated = () => {
     const {scale} = this.state;
     const toValue = scale._value === 1 ? 1.5 : 1;
@@ -54,24 +62,22 @@ class CartIcon extends React.Component<Props> {
 
   render() {
     const {iconProps, navigation, count, configs} = this.props;
-    const heightBadge = 16;
+    // const heightBadge = 16;
 
-    const badgeStyle = {
-      borderRadius: heightBadge / 2,
-      minWidth: heightBadge,
-    };
+    // const badgeStyle = {
+    //   borderRadius: heightBadge / 2,
+    //   minWidth: heightBadge,
+    // };
 
-    const textStyle = {
-      textAlign: 'center',
-      fontSize: 8,
-    };
+    // const textStyle = {
+    //   textAlign: 'center',
+    //   fontSize: 8,
+    // };
     if (!configs.get('toggleCheckout')) {
       return null;
     }
     return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate(homeTabs.cart)}
-        style={styles.container}>
+      <TouchableOpacity onPress={this.signOut} style={styles.container}>
         <Animated.View
           style={[
             styles.view,

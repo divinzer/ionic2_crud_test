@@ -12,14 +12,14 @@ export const authStack = {
 export const homeTabs = {
   // home_drawer: 'HomeDrawer',
   shop: 'ShopStack',
-  wish_list: 'WishListStack',
+  wish_list: 'WishListScreen',
   cart: 'CartStack',
   me: 'ProfileStack',
 };
 
 export const mainStack = {
+  wish_list: 'WishListScreen',
   home_tab: 'HomeTab',
-  wish_list: 'WishListStack',
   check_list: 'CheckListStack',
   feedback: 'FeedbackScreen',
   blog: 'BlogScreen',

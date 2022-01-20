@@ -3,6 +3,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 // import isEqual from 'lodash/isEqual';
+import NavigationServices from 'src/utils/navigation';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {StyleSheet, View, ActivityIndicator, RefreshControl} from 'react-native';
@@ -28,7 +29,7 @@ import {
 } from 'src/modules/firebase/selectors';
 
 import {margin} from 'src/components/config/spacing';
-import {mainStack} from '../config/navigator';
+import {authStack, rootSwitch, mainStack} from '../config/navigator';
 
 const stateSelector = createStructuredSelector({
   loading: loadingListSelector(),
@@ -41,7 +42,7 @@ const WishListScreen = () => {
   const {loading, weeklyCheck} = useSelector(stateSelector);
   // Set an initializing state whilst Firebase connects
   const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
   const [isModal, setModal] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalName, setModalName] = useState('');
@@ -59,11 +60,6 @@ const WishListScreen = () => {
     fetchData();
     setRefreshing(false);
   }, [refreshing]);
-
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
-  }, []);
 
   const fetchData = async () => {
     dispatch({type: FETCH_WEEKLY_CHECK});
@@ -98,6 +94,9 @@ const WishListScreen = () => {
 
   useEffect(() => {
     fetchData();
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    console.log('ss', subscriber);
+    return subscriber; // unsubscribe on unmount
   }, []);
 
   // useEffect(() => {
@@ -121,7 +120,7 @@ const WishListScreen = () => {
           icon="heart"
           title={'데이터가 없습니다.'}
           titleButton={'로그인 페이지로 가기'}
-          clickButton={() => navigation.navigate(mainStack.check_list)}
+          clickButton={() => navigation.navigate(authStack.login)}
         />
       );
     }
@@ -153,6 +152,12 @@ const WishListScreen = () => {
       />
     );
   };
+
+  if (initializing) return null;
+
+  if (!user) {
+    NavigationServices.navigate(rootSwitch.auth, {screen: authStack.login});
+  }
 
   return (
     <ThemedView style={styles.container}>

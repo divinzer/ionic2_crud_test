@@ -1,86 +1,88 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {createStructuredSelector} from 'reselect';
-import {useSelector, useDispatch} from 'react-redux';
-import {StyleSheet, ScrollView, KeyboardAvoidingView} from 'react-native';
-import {
-  Header,
-  ThemedView,
-  Button,
-  ThemeConsumer,
-} from 'src/components';
+import auth from '@react-native-firebase/auth';
+import {StyleSheet, KeyboardAvoidingView} from 'react-native';
+import {Header, ThemedView, Button, ThemeConsumer} from 'src/components';
 import Container from 'src/containers/Container';
 import Input from 'src/containers/input/Input';
-import TextHtml from 'src/containers/TextHtml';
 import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
+import NavigationServices from 'src/utils/navigation';
+import {rootSwitch, mainStack} from 'src/config/navigator';
 
-import {rootSwitch} from 'src/config/navigator';
-
-import {signInWithEmail} from 'src/modules/firebase/actions';
-import {authSelector} from 'src/modules/firebase/selectors';
-// import {requiredLoginSelector} from 'src/modules/common/selectors';
 import {margin} from 'src/components/config/spacing';
-
-import {changeColor} from 'src/utils/text-html';
-
-const stateSelector = createStructuredSelector({
-  auth: authSelector(),
-  // requiredLogin: requiredLoginSelector(),
-});
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const {auth} = useSelector(stateSelector);
-  const {pending, loginError} = auth;
-  const {message, errors} = loginError;
-
+  const [loading, setLoading] = useState(false);
+  const [errors, setError] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    dispatch(signInWithEmail({username, password}));
+  const handleLogin = async () => {
+    // dispatch(signInWithEmail({username, password}));
+    setLoading(true);
+    try {
+      await auth().signInWithEmailAndPassword(username, password);
+      setLoading(false);
+      navigation.navigate(rootSwitch.main);
+    } catch (e) {
+      setError(e);
+      setLoading(false);
+    }
   };
+
+  const checkLogin = async () => {
+    const currentUser = await auth().currentUser;
+    if (currentUser) {
+      // navigation.navigate(rootSwitch.main);
+      NavigationServices.navigate(rootSwitch.main, {
+        screen: mainStack.wish_list,
+      });
+    }
+  };
+
+  useEffect(() => {
+    checkLogin();
+  }, []);
 
   return (
     <ThemeConsumer>
       {({theme}) => (
         <ThemedView isFullView>
           <Header
-            leftComponent={
-              <IconHeader
-                name="x"
-                size={24}
-                onPress={() => navigation.navigate(rootSwitch.main)}
-              />
-            }
+            // leftComponent={
+            //   <IconHeader
+            //     name="x"
+            //     size={24}
+            //     onPress={() => navigation.navigate(rootSwitch.main)}
+            //   />
+            // }
             centerComponent={<TextHeader title={'LogIn'} />}
           />
           <KeyboardAvoidingView behavior="height" style={styles.keyboard}>
-            <ScrollView>
-              <Container>
-                <Input
-                  label={'email_address'}
-                  value={username}
-                  onChangeText={value => setUsername(value)}
-                  error={errors && errors.username}
-                  keyboardType="email-address"
-                />
-                <Input
-                  label={'password'}
-                  value={password}
-                  secureTextEntry
-                  onChangeText={value => setPassword(value)}
-                  error={errors && errors.password}
-                />
-                <Button
-                  title={'Login'}
-                  loading={pending}
-                  onPress={handleLogin}
-                  containerStyle={styles.margin}
-                />
-              </Container>
-            </ScrollView>
+            <Container>
+              <Input
+                label={'email_address'}
+                value={username}
+                onChangeText={value => setUsername(value)}
+                error={errors && errors.message}
+                keyboardType="email-address"
+              />
+              <Input
+                label={'password'}
+                value={password}
+                secureTextEntry
+                onChangeText={value => setPassword(value)}
+                error={errors && errors.code}
+              />
+              <Button
+                title={'Login'}
+                disabled={!username || !password}
+                loading={loading}
+                onPress={handleLogin}
+                containerStyle={styles.margin}
+              />
+            </Container>
           </KeyboardAvoidingView>
         </ThemedView>
       )}

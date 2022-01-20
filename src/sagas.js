@@ -8,7 +8,7 @@ import commonSaga from './modules/common/saga';
 import orderSaga from './modules/order/saga';
 import vendorSaga from './modules/vendor/saga';
 import checkoutSaga from './modules/checkout/saga';
-import firebaseSaga from './modules/firebase/saga';
+// import firebaseSaga from './modules/firebase/saga';
 
 /**
  * Root saga
@@ -24,6 +24,6 @@ export default function* rootSagas() {
     orderSaga(),
     vendorSaga(),
     checkoutSaga(),
-    firebaseSaga(),
+    // firebaseSaga(),
   ]);
 }

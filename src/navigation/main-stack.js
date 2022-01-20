@@ -7,7 +7,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import HomeTabs from './home-tabs';
 import CheckListScreen from 'src/screens/check-list';
 import FeedbackScreen from 'src/screens/feedback';
-import Blog from 'src/screens/blog/blog';
+import WishListScreen from 'src/screens/wishlist';
 import Checkout from 'src/screens/cart/checkout';
 // import WeViewCheckout from 'src/screens/cart/webview-checkout';
 // import WeViewPayment from 'src/screens/cart/webview-payment';
@@ -52,12 +52,17 @@ const Stack = createStackNavigator();
 function MainStack() {
   return (
     <Stack.Navigator
-      initialRouteName={mainStack.home_tab}
+      initialRouteName={mainStack.wish_list}
       screenOptions={{gestureEnabled: false}}>
       <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.home_tab}
         component={HomeTabs}
+      />
+      <Stack.Screen
+        options={{headerShown: false}}
+        name={mainStack.wish_list}
+        component={WishListScreen}
       />
       <Stack.Screen
         options={{headerShown: false}}
