@@ -7,7 +7,9 @@ import {
   StyleSheet,
   Animated,
   Dimensions,
+  Text
 } from 'react-native';
+// import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
 import Icon from '../icons/Icon';
 import {withTheme} from '../config';
 import {padding, borderRadius} from '../config/spacing';
@@ -15,7 +17,8 @@ import {padding, borderRadius} from '../config/spacing';
 const {height: heightWindow} = Dimensions.get('window');
 
 const getHeightView = (heightFull = heightWindow, ratio = 0.5) => {
-  const getRatio = ratio < 0.5 || ratio > 1 ? 0.5 : ratio;
+  // const getRatio = ratio < 0.5 || ratio > 1 ? 0.5 : ratio;
+  const getRatio = ratio;
   return heightFull * getRatio;
 };
 
@@ -68,6 +71,7 @@ class ModalSelect extends Component {
       children,
       setModalVisible,
       backgroundColor,
+      title,
     } = this.props;
     const {opacity, visible, height} = this.state;
 
@@ -81,7 +85,9 @@ class ModalSelect extends Component {
       </TouchableOpacity>
     );
 
-    const topRight = topRightElement ? topRightElement : null;
+    const topCenter = <Text>{title}</Text>;
+
+    const topRight = topRightElement ? topRightElement : <View />;
 
     const bottom = opacity.interpolate({
       inputRange: [0, 0.5],
@@ -122,6 +128,7 @@ class ModalSelect extends Component {
             ]}>
             <View style={styles.header}>
               {topLeft}
+              {topCenter}
               {topRight}
             </View>
 

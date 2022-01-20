@@ -59,12 +59,6 @@ const LoginScreen = () => {
           <KeyboardAvoidingView behavior="height" style={styles.keyboard}>
             <ScrollView>
               <Container>
-                {message ? (
-                  <TextHtml
-                    value={message}
-                    style={changeColor(theme.colors.error)}
-                  />
-                ) : null}
                 <Input
                   label={'email_address'}
                   value={username}

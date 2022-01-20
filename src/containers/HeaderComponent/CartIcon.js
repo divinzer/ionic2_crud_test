@@ -79,14 +79,14 @@ class CartIcon extends React.Component<Props> {
               transform: [{scale: this.state.scale}],
             },
           ]}>
-          <Badge
+          {/* <Badge
             status="error"
             badgeStyle={badgeStyle}
             textStyle={textStyle}
             value={count}
-          />
+          /> */}
         </Animated.View>
-        <Icon name="shopping-bag" size={20} {...iconProps} />
+        <Icon name="log-out" size={20} {...iconProps} />
       </TouchableOpacity>
     );
   }

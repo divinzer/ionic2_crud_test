@@ -22,9 +22,8 @@ const stockStatusList = ['instock', 'onbackorder'];
 const ItemWishlist = React.memo(props => {
   const {t} = useTranslation();
   const navigation = useNavigation();
-  const {item, style, configs, loading, addCart} = props;
-  const {weekName, type, id, purchasable, stock_status} =
-    item;
+  const {item, style, configs, loading, addCart, onModal} = props;
+  const {weekName, type, id, purchasable, stock_status} = item;
   const goProductDetail = () =>
     navigation.navigate(mainStack.check_list, {
       item,
@@ -75,7 +74,9 @@ const ItemWishlist = React.memo(props => {
                   type="font-awesome"
                   name={'pencil'}
                   color={grey4}
-                  // onPress={wishListAction}
+                  onPress={() => {
+                    onModal('주차이름 변경', weekName);
+                  }}
                   underlayColor={'transparent'}
                   // style={{marginRight: 10}}
                 />

@@ -1,11 +1,11 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {sortBy, merge} from 'lodash';
 import {StyleSheet, FlatList, View} from 'react-native';
 import {Row, Col} from 'src/containers/Gird';
-import {Header, Icon, ThemedView, Text} from 'src/components';
+import {Header, Icon, ThemedView, Text, Modal} from 'src/components';
 import Input from 'src/containers/input/Input';
 import Button from 'src/containers/Button';
 import Container from 'src/containers/Container';
@@ -40,6 +40,7 @@ const CheckListScreen = props => {
   const fId = route.params.item.id;
   const dispatch = useDispatch();
   const {loading, checkList} = useSelector(stateSelector);
+  const [isModal, setModal] = useState(false);
   // const [loading, setLoading] = useState(false);
   let arr0 = [];
   let arr1 = [];
@@ -54,6 +55,12 @@ const CheckListScreen = props => {
     dispatch(removeWishList(product_id));
   };
 
+  const onModal = (title, name) => {
+    // setModalTitle(title);
+    // setModalName(name);
+    setModal(!isModal);
+  };
+  
   const fetchKitchenList = async () => {
     try {
       // setLoading(true);
@@ -178,7 +185,7 @@ const CheckListScreen = props => {
               type="font-awesome"
               name={'plus-circle'}
               color={grey4}
-              // onPress={wishListAction}
+              onPress={onModal}
               underlayColor={'transparent'}
               containerStyle={{paddingRight: 10, paddingTop: 5}}
               // style={{paddingRight: 100}}
@@ -205,7 +212,7 @@ const CheckListScreen = props => {
               type="font-awesome"
               name={'plus-circle'}
               color={grey4}
-              // onPress={wishListAction}
+              onPress={onModal}
               underlayColor={'transparent'}
               containerStyle={{paddingRight: 10, paddingTop: 5}}
               // style={{paddingRight: 100}}
@@ -232,7 +239,7 @@ const CheckListScreen = props => {
               type="font-awesome"
               name={'plus-circle'}
               color={grey4}
-              // onPress={wishListAction}
+              onPress={onModal}
               underlayColor={'transparent'}
               containerStyle={{paddingRight: 10, paddingTop: 5}}
               // style={{paddingRight: 100}}
@@ -277,8 +284,8 @@ const CheckListScreen = props => {
           onPress={()=>{}}
         />
       </Container>
-    )
-  }
+    );
+  };
   return (
     <ThemedView isFullView>
       <Header
@@ -294,6 +301,30 @@ const CheckListScreen = props => {
         ListFooterComponentStyle={<View style={styles.footer} />}
         ListFooterComponent={footer}
       />
+      <Modal
+        visible={isModal}
+        transparent
+        setModalVisible={value => setModal(value)}
+        ratioHeight={0.5}
+        title={'체크 아이템 내용 추가'}>
+        <Container>
+          <View style={styles.marginBottom('small')}>
+            <Input
+              label={'아이템 내용을 기입해주세요.'}
+              multiline
+              numberOfLines={8}
+              value={''}
+              onChangeText={value => this.setState({review: value})}
+            />
+          </View>
+          <Button
+            loading={false}
+            title={'추가'}
+            containerStyle={styles.marginBottom('big')}
+            onPress={()=>{}}
+          />
+        </Container>
+      </Modal>
     </ThemedView>
   );
 };

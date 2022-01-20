@@ -9,11 +9,12 @@ import {StyleSheet, View, ActivityIndicator, RefreshControl} from 'react-native'
 import {Header, ThemedView, Modal} from 'src/components';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import ProductItem from 'src/containers/ProductItem';
-import {TextHeader, CartIcon} from 'src/containers/HeaderComponent';
+import {TextHeader, CartIcon, IconHeader} from 'src/containers/HeaderComponent';
 import Empty from 'src/containers/Empty';
 import Button from 'src/containers/Button';
 import Container from 'src/containers/Container';
 import ButtonSwiper from 'src/containers/ButtonSwiper';
+import Input from 'src/containers/input/Input';
 
 import {
   FETCH_WEEKLY_CHECK,
@@ -41,7 +42,9 @@ const WishListScreen = () => {
   // Set an initializing state whilst Firebase connects
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
-  const [isModal, setModal] = useState(true);
+  const [isModal, setModal] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalName, setModalName] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
   // Handle user state changes
@@ -105,6 +108,12 @@ const WishListScreen = () => {
     dispatch(removeWishList(product_id));
   };
 
+  const onModal = (title, name) => {
+    setModalTitle(title);
+    setModalName(name);
+    setModal(!isModal);
+  };
+
   const renderData = data => {
     if (!data) {
       return (
@@ -129,6 +138,7 @@ const WishListScreen = () => {
             item={item}
             style={index === 0 ? styles.firstItem : undefined}
             type="wishlist"
+            onModal={onModal}
           />
         )}
         renderHiddenItem={({item}) => (
@@ -160,16 +170,34 @@ const WishListScreen = () => {
       <Container>
         <Button
           loading={false}
-          title={'저장'}
+          title={'생성'}
           containerStyle={styles.marginBottom('big')}
-          onPress={()=>{}}
+          onPress={() => onModal('생성', null)}
         />
       </Container>
       <Modal
         visible={isModal}
+        transparent
         setModalVisible={value => setModal(value)}
-        ratioHeight={0.1}>
-        <Container />
+        ratioHeight={0.3}
+        title={modalTitle}>
+        <Container>
+          <View style={styles.marginBottom('small')}>
+            <Input
+              label={modalName || '예) 3월 1주차...'}
+              multiline
+              numberOfLines={1}
+              value={''}
+              onChangeText={value => this.setState({review: value})}
+            />
+          </View>
+          <Button
+            loading={false}
+            title={'저장'}
+            containerStyle={styles.marginBottom('big')}
+            onPress={()=>{}}
+          />
+        </Container>
       </Modal>
     </ThemedView>
   );
