@@ -74,16 +74,16 @@ const WishListScreen = () => {
       await ref.onSnapshot(querySnapshot => {
         querySnapshot &&
           querySnapshot.forEach(doc => {
-            // console.log('q', querySnapshot);
-            const {weekName, ketchenMemo, writtenAt} = doc.data();
+            const {weekName, ketchenMemo, hasFeedback, isDeleted, writtenAt} = doc.data();
             arr.push({
               id: doc.id,
               weekName,
               ketchenMemo,
+              hasFeedback,
+              isDeleted,
               writtenAt,
             });
           });
-          // console.log('arr', arr);
         dispatch({type: FETCH_WEEKLY_CHECK_SUCCESS, payload: arr});
       });
     } catch (e) {

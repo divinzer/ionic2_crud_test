@@ -23,7 +23,7 @@ const ItemWishlist = React.memo(props => {
   const {t} = useTranslation();
   const navigation = useNavigation();
   const {item, style, configs, loading, addCart, onModal} = props;
-  const {weekName, type, id, purchasable, stock_status} = item;
+  const {weekName, type, isDeleted, hasFeedback, id, purchasable, stock_status} = item;
   const goProductDetail = () =>
     navigation.navigate(mainStack.check_list, {
       item,
@@ -59,15 +59,17 @@ const ItemWishlist = React.memo(props => {
                   {unescape(weekName)}
                 </Text>
                 {/* <Price price_format={price_format} type={type} /> */}
-                <Icon
-                  size={19}
-                  type="font-awesome"
-                  name={'exclamation-circle'}
-                  color={'orange'}
-                  // onPress={wishListAction}
-                  underlayColor={'transparent'}
-                  // style={{marginRight: 100}}
-                />
+                {hasFeedback && (
+                  <Icon
+                    size={19}
+                    type="font-awesome"
+                    name={'exclamation-circle'}
+                    color={'orange'}
+                    // onPress={wishListAction}
+                    underlayColor={'transparent'}
+                    // style={{marginRight: 100}}
+                  />
+                )}
                 <Text style={{marginRight: 20}} />
                 <Icon
                   size={19}
