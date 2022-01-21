@@ -75,14 +75,11 @@ const CheckListScreen = props => {
           feedback['식재관리'],
           feedback['조리장위생'],
         );
-        console.log('obj', obj);
         for (const item in obj) {
-          console.log('item', item, obj[item]);
           dispatch({
             type: CHANGE_CHECK_FEEDBACK,
             payload: {name: item, value: obj[item]},
           });
-          console.log('run');
         }
 
         // chkeck in checked
@@ -124,7 +121,7 @@ const CheckListScreen = props => {
       const ref = firestore().collection('checklist').doc('checkItems');
       await ref.onSnapshot(documentSnapshot => {
         if (documentSnapshot !== null) {
-          console.log('data1', documentSnapshot);
+          // console.log('data1', documentSnapshot);
           for (const item in documentSnapshot.data()['개인위생']) {
             let value = documentSnapshot.data()['개인위생'][item];
             arr0.push({
@@ -137,7 +134,7 @@ const CheckListScreen = props => {
           arr0 = sortBy(arr0, function (o) {
             return Number(o.checkName.replace('hygiene', ''));
           });
-          console.log('data2', documentSnapshot);
+          // console.log('data2', documentSnapshot);
           for (const item in documentSnapshot.data()['식재관리']) {
             let value = documentSnapshot.data()['식재관리'][item];
             arr1.push({
@@ -147,7 +144,7 @@ const CheckListScreen = props => {
               feedback: null,
             });
           }
-          console.log('data3', documentSnapshot);
+          // console.log('data3', documentSnapshot);
           arr1 = sortBy(arr1, function (o) {
             return Number(o.checkName.replace('ingredient', ''));
           });

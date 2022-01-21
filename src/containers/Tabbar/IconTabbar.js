@@ -6,7 +6,7 @@ import {Dot} from '../Pagination';
 import {red} from 'src/components/config/colors';
 
 import {countWishListSelector} from 'src/modules/common/selectors';
-import {countItemSelector} from 'src/modules/cart/selectors';
+// import {countItemSelector} from 'src/modules/cart/selectors';
 
 class IconTabbar extends React.Component {
   render() {
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   countWishlist: countWishListSelector(state),
-  countCart: countItemSelector(state),
+  // countCart: countItemSelector(state),
 });
 
 export default connect(mapStateToProps, null)(IconTabbar);

@@ -1,8 +1,8 @@
 export const authStack = {
   login: 'LoginScreen',
-  login_mobile: 'LoginMobileScreen',
+  // login_mobile: 'LoginMobileScreen',
   // register: 'RegisterScreen',
-  forgot: 'ForgotScreen',
+  // forgot: 'ForgotScreen',
 };
 
 // export const homeDrawer = {
@@ -11,56 +11,56 @@ export const authStack = {
 
 export const homeTabs = {
   // home_drawer: 'HomeDrawer',
-  shop: 'ShopStack',
-  wish_list: 'WishListScreen',
-  cart: 'CartStack',
-  me: 'ProfileStack',
+  // shop: 'ShopStack',
+  // wish_list: 'WishListScreen',
+  // cart: 'CartStack',
+  // me: 'ProfileStack',
 };
 
 export const mainStack = {
   wish_list: 'WishListScreen',
-  home_tab: 'HomeTab',
+  // home_tab: 'HomeTab',
   check_list: 'CheckListStack',
   feedback: 'FeedbackScreen',
-  blog: 'BlogScreen',
+  // blog: 'BlogScreen',
 
-  checkout: 'CheckOutScreen',
+  // checkout: 'CheckOutScreen',
   // webview_checkout: 'WebviewCheckout',
   // webview_payment: 'WebviewPayment',
   // webview_thank_you: 'WebviewThankYou',
 
-  search: 'SearchScreen',
-  products: 'ProductsScreen',
+  // search: 'SearchScreen',
+  // products: 'ProductsScreen',
 
-  product: 'ProductScreen',
-  product_review: 'ProductReviewScreen',
-  product_review_form: 'ProductReviewFromScreen',
-  product_description: 'ProductDescriptionFromScreen',
-  product_attribute: 'ProductAttributeFromScreen',
+  // product: 'ProductScreen',
+  // product_review: 'ProductReviewScreen',
+  // product_review_form: 'ProductReviewFromScreen',
+  // product_description: 'ProductDescriptionFromScreen',
+  // product_attribute: 'ProductAttributeFromScreen',
 
-  refine: 'RefineScreen',
-  filter_attribute: 'FilterAttribute',
-  filter_category: 'FilterCategory',
-  filter_tag: 'FilterTag',
-  filter_price: 'FilterPrice',
+  // refine: 'RefineScreen',
+  // filter_attribute: 'FilterAttribute',
+  // filter_category: 'FilterCategory',
+  // filter_tag: 'FilterTag',
+  // filter_price: 'FilterPrice',
 
-  stores: 'StoresScreen',
-  store_detail: 'StoreDetailScreen',
-  store_review: 'StoreReviewScreen',
+  // stores: 'StoresScreen',
+  // store_detail: 'StoreDetailScreen',
+  // store_review: 'StoreReviewScreen',
 
-  // linking_webview: 'LinkingWebviewScreen',
-  setting: 'SettingScreen',
-  help: 'HelpScreen',
-  contact: 'ContactScreen',
-  account: 'AccountScreen',
-  change_password: 'ChangePasswordScreen',
-  address_book: 'AddressBookScreen',
-  order_list: 'OrderList',
-  order_detail: 'OrderDetail',
-  demo_config: 'DemoConfigScreen',
-  edit_account: 'EditAccountScreen',
-  downloads: 'DownloadsScreen',
-  page: 'PageScreen',
+  // // linking_webview: 'LinkingWebviewScreen',
+  // setting: 'SettingScreen',
+  // help: 'HelpScreen',
+  // contact: 'ContactScreen',
+  // account: 'AccountScreen',
+  // change_password: 'ChangePasswordScreen',
+  // address_book: 'AddressBookScreen',
+  // order_list: 'OrderList',
+  // order_detail: 'OrderDetail',
+  // demo_config: 'DemoConfigScreen',
+  // edit_account: 'EditAccountScreen',
+  // downloads: 'DownloadsScreen',
+  // page: 'PageScreen',
 };
 
 export const rootSwitch = {

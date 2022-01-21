@@ -4,48 +4,48 @@ import {mainStack} from 'src/config/navigator';
 
 import {createStackNavigator} from '@react-navigation/stack';
 
-import HomeTabs from './home-tabs';
+// import HomeTabs from './home-tabs';
 import CheckListScreen from 'src/screens/check-list';
 import FeedbackScreen from 'src/screens/feedback';
 import WishListScreen from 'src/screens/wishlist';
-import Checkout from 'src/screens/cart/checkout';
+// import Checkout from 'src/screens/cart/checkout';
 // import WeViewCheckout from 'src/screens/cart/webview-checkout';
 // import WeViewPayment from 'src/screens/cart/webview-payment';
 // import WeViewThankYou from 'src/screens/cart/webview-thankyou';
 
-import Products from 'src/screens/shop/products';
-import Search from 'src/screens/shop/search';
+// import Products from 'src/screens/shop/products';
+// import Search from 'src/screens/shop/search';
 
-import Product from 'src/screens/shop/product';
-import ProductReview from 'src/screens/shop/product-review';
-import ProductReviewForm from 'src/screens/shop/product-review-form';
-import ProductDescription from 'src/screens/shop/product-description';
-import ProductAttribute from 'src/screens/shop/product-attribute';
+// import Product from 'src/screens/shop/product';
+// import ProductReview from 'src/screens/shop/product-review';
+// import ProductReviewForm from 'src/screens/shop/product-review-form';
+// import ProductDescription from 'src/screens/shop/product-description';
+// import ProductAttribute from 'src/screens/shop/product-attribute';
 
-import Refine from 'src/screens/shop/refine';
-import FilterCategory from 'src/screens/shop/filter-category';
-import FilterAttribute from 'src/screens/shop/filter-attribute';
-import FilterTag from 'src/screens/shop/filter-tag';
-import FilterPrice from 'src/screens/shop/filter-price';
+// import Refine from 'src/screens/shop/refine';
+// import FilterCategory from 'src/screens/shop/filter-category';
+// import FilterAttribute from 'src/screens/shop/filter-attribute';
+// import FilterTag from 'src/screens/shop/filter-tag';
+// import FilterPrice from 'src/screens/shop/filter-price';
 
-import Stores from 'src/screens/shop/stores';
-import StoreDetail from 'src/screens/shop/store-detail';
-import StoreReview from 'src/screens/shop/store-review';
+// import Stores from 'src/screens/shop/stores';
+// import StoreDetail from 'src/screens/shop/store-detail';
+// import StoreReview from 'src/screens/shop/store-review';
 
 // import LinkingWebview from 'src/screens/linking-webview';
 
-import SettingScreen from 'src/screens/profile/setting';
-import HelpScreen from 'src/screens/profile/help';
-import ContactScreen from 'src/screens/profile/contact';
-import AccountScreen from 'src/screens/profile/account';
-import ChangePasswordScreen from 'src/screens/profile/change-password';
-import AddressBookScreen from 'src/screens/profile/address-book';
-import OrderList from 'src/screens/profile/orders';
-import OrderDetail from 'src/screens/profile/order';
-import DemoConfig from 'src/screens/profile/demo-config';
-import EditAccount from 'src/screens/profile/edit-account';
-import Downloads from 'src/screens/profile/downloads';
-import Page from 'src/screens/profile/Page';
+// import SettingScreen from 'src/screens/profile/setting';
+// import HelpScreen from 'src/screens/profile/help';
+// import ContactScreen from 'src/screens/profile/contact';
+// import AccountScreen from 'src/screens/profile/account';
+// import ChangePasswordScreen from 'src/screens/profile/change-password';
+// import AddressBookScreen from 'src/screens/profile/address-book';
+// import OrderList from 'src/screens/profile/orders';
+// import OrderDetail from 'src/screens/profile/order';
+// import DemoConfig from 'src/screens/profile/demo-config';
+// import EditAccount from 'src/screens/profile/edit-account';
+// import Downloads from 'src/screens/profile/downloads';
+// import Page from 'src/screens/profile/Page';
 
 const Stack = createStackNavigator();
 
@@ -54,11 +54,11 @@ function MainStack() {
     <Stack.Navigator
       initialRouteName={mainStack.wish_list}
       screenOptions={{gestureEnabled: false}}>
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.home_tab}
         component={HomeTabs}
-      />
+      /> */}
       <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.wish_list}
@@ -174,11 +174,11 @@ function MainStack() {
         name={mainStack.linking_webview}
         component={LinkingWebview}
       /> */}
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.setting}
         component={SettingScreen}
-      />
+      /> */}
       {/* <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.contact}

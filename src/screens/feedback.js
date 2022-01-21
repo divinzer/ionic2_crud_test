@@ -11,6 +11,7 @@ import CheckBox from 'src/components/checkbox/CheckBox';
 import Input from 'src/containers/input/Input';
 import Button from 'src/containers/Button';
 import Container from 'src/containers/Container';
+import ChooseItem from 'src/containers/ChooseItem';
 import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
 import {grey4, grey6} from 'src/components/config/colors';
 
@@ -92,9 +93,17 @@ const FeedbackScreen = props => {
     // }
   };
 
-  useEffect(()=> {
+  useEffect(() => {
     fetchImage();
   }, [])
+
+  const topElement = (
+    <Image
+      source={{uri: imageUrl[0]}}
+      style={[styles.image, styles.marginBottom('small')]}
+      resizeMode="stretch"
+    />
+  );
 
   return (
     <ThemedView isFullView>
@@ -125,6 +134,14 @@ const FeedbackScreen = props => {
                   resizeMode="stretch"
                   style={[styles.image, styles.marginBottom('small')]}
                 />
+                {/* <ChooseItem
+                  key={'1'}
+                  item={'1'}
+                  onPress={() => {}}
+                  active={true}
+                  topElement={topElement}
+                  containerStyle={styles.item}
+                /> */}
                 {/* 
                 <Image
                   source={require('src/assets/images/pDefault.png')}
@@ -206,6 +223,9 @@ const styles = {
   tab: {
     fontSize: 10,
     lineHeight: 15,
+  },
+  item: {
+    marginRight: margin.base,
   },
 };
 

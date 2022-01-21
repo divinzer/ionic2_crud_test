@@ -84,11 +84,12 @@ const styles = StyleSheet.create({
     marginVertical: margin.base,
   },
   touchView: {
-    paddingHorizontal: padding.large,
-    paddingVertical: padding.small,
+    // paddingHorizontal: padding.large,
+    // paddingVertical: padding.small,
     borderWidth: 1,
     borderRadius: borderRadius.base - 1,
-    minWidth: 150,
+    maxWidth: 126,
+    maxHeight: 126,
     zIndex: 2,
   },
   icon: {

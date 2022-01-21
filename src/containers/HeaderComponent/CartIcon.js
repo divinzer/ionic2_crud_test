@@ -3,15 +3,16 @@ import React from 'react';
 import auth from '@react-native-firebase/auth';
 import {StyleSheet, TouchableOpacity, Animated} from 'react-native';
 
-import {connect} from 'react-redux';
+// import {connect} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {ScreenProps} from 'react-native-screens';
 import {Badge, Icon} from 'src/components';
 import NavigationServices from 'src/utils/navigation';
 import {rootSwitch, authStack} from 'src/config/navigator';
 
-import {countItemSelector} from 'src/modules/cart/selectors';
-import {configsSelector} from 'src/modules/common/selectors';
+// import {countItemSelector} from 'src/modules/cart/selectors';
+// import {configsSelector} from 'src/modules/common/selectors';
+import {white, black, orange, grey4} from 'src/components/config/colors';
 
 type Props = {
   value: number,
@@ -61,7 +62,8 @@ class CartIcon extends React.Component<Props> {
   };
 
   render() {
-    const {iconProps, navigation, count, configs} = this.props;
+    const {iconProps, navigation} = this.props;
+    console.log('i', iconProps);
     // const heightBadge = 16;
 
     // const badgeStyle = {
@@ -73,9 +75,9 @@ class CartIcon extends React.Component<Props> {
     //   textAlign: 'center',
     //   fontSize: 8,
     // };
-    if (!configs.get('toggleCheckout')) {
-      return null;
-    }
+    // if (!configs.get('toggleCheckout')) {
+    //   return null;
+    // }
     return (
       <TouchableOpacity onPress={this.signOut} style={styles.container}>
         <Animated.View
@@ -92,7 +94,7 @@ class CartIcon extends React.Component<Props> {
             value={count}
           /> */}
         </Animated.View>
-        <Icon name="log-out" size={20} {...iconProps} />
+        <Icon color={black} type="font-awesome" name={'sign-out'} size={20} underlayColor={'transparent'} />
       </TouchableOpacity>
     );
   }
@@ -114,12 +116,12 @@ CartIcon.defaultProps = {
   iconProps: {},
 };
 
-const mapStateToProps = state => ({
-  count: countItemSelector(state),
-  configs: configsSelector(state),
-});
+// const mapStateToProps = state => ({
+//   count: countItemSelector(state),
+//   configs: configsSelector(state),
+// });
 
-const CartIconComponent = connect(mapStateToProps)(CartIcon);
+const CartIconComponent = CartIcon;
 
 export default function (props) {
   const navigation = useNavigation();

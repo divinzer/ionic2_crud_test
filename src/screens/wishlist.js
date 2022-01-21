@@ -63,17 +63,18 @@ const WishListScreen = () => {
 
   const fetchData = async () => {
     dispatch({type: FETCH_WEEKLY_CHECK});
-
+    console.log('run');
     try {
-      let arr = [];
-      const ref = firestore()
+      const ref = await firestore()
         .collection('weeklyCheck')
         .where('isDeleted', '==', false)
         .orderBy('writtenAt', 'desc')
         .limit(8);
-      await ref.onSnapshot(querySnapshot => {
-        querySnapshot &&
+      await ref.onSnapshot((querySnapshot, err) => {
+        const arr = [];
+        if (querySnapshot) {
           querySnapshot.forEach(doc => {
+            console.log('doc', doc);
             const {weekName, ketchenMemo, hasFeedback, isDeleted, writtenAt} = doc.data();
             arr.push({
               id: doc.id,
@@ -84,7 +85,10 @@ const WishListScreen = () => {
               writtenAt,
             });
           });
-        dispatch({type: FETCH_WEEKLY_CHECK_SUCCESS, payload: arr});
+          dispatch({type: FETCH_WEEKLY_CHECK_SUCCESS, payload: arr});
+        } else {
+          dispatch({type: FETCH_WEEKLY_CHECK_ERROR, payload: ''});
+        }
       });
     } catch (e) {
       dispatch({type: FETCH_WEEKLY_CHECK_ERROR, payload: e});
@@ -95,7 +99,6 @@ const WishListScreen = () => {
   useEffect(() => {
     fetchData();
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    console.log('ss', subscriber);
     return subscriber; // unsubscribe on unmount
   }, []);
 
@@ -135,6 +138,7 @@ const WishListScreen = () => {
         renderItem={({item, index}) => (
           <ProductItem
             item={item}
+            key={index}
             style={index === 0 ? styles.firstItem : undefined}
             type="wishlist"
             onModal={onModal}
