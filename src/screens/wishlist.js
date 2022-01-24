@@ -16,6 +16,7 @@ import Button from 'src/containers/Button';
 import Container from 'src/containers/Container';
 import ButtonSwiper from 'src/containers/ButtonSwiper';
 import Input from 'src/containers/input/Input';
+import {handleError} from 'src/utils/error';
 
 import {
   FETCH_WEEKLY_CHECK,
@@ -45,8 +46,16 @@ const WishListScreen = () => {
   const [user, setUser] = useState(null);
   const [isModal, setModal] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
-  const [modalName, setModalName] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [weekTitle, setWeekTitle] = useState('');
+  const [selectedDoc, setSelectedDoc] = useState({id: '', weekName: ''});
+  const ref = firestore()
+    .collection('weeklyCheck')
+    .where('isDeleted', '==', false)
+    .orderBy('writtenAt', 'desc')
+    .limit(8);
+
+  const refDB = firestore().collection('weeklyCheck');
 
   // Handle user state changes
   function onAuthStateChanged(user) {
@@ -63,23 +72,18 @@ const WishListScreen = () => {
 
   const fetchData = async () => {
     dispatch({type: FETCH_WEEKLY_CHECK});
-    console.log('run');
+    // console.log('run');
     try {
-      const ref = await firestore()
-        .collection('weeklyCheck')
-        .where('isDeleted', '==', false)
-        .orderBy('writtenAt', 'desc')
-        .limit(8);
       await ref.onSnapshot((querySnapshot, err) => {
         const arr = [];
         if (querySnapshot) {
           querySnapshot.forEach(doc => {
-            console.log('doc', doc);
-            const {weekName, ketchenMemo, hasFeedback, isDeleted, writtenAt} = doc.data();
+            // console.log('doc', doc);
+            const {weekName, kitchenMemo, hasFeedback, isDeleted, writtenAt} = doc.data();
             arr.push({
               id: doc.id,
               weekName,
-              ketchenMemo,
+              kitchenMemo,
               hasFeedback,
               isDeleted,
               writtenAt,
@@ -96,6 +100,66 @@ const WishListScreen = () => {
     }
   };
 
+  const createData = async () => {
+    try {
+      console.log('run');
+      if (modalTitle === '생성' && weekTitle) {
+        const add = await refDB.add({
+          weekName: weekTitle,
+          kitchenMemo: '',
+          hasFeedback: false,
+          isDeleted: false,
+          writtenAt: Date(),
+        });
+        console.log('title', add);
+        setModal(false);
+        setWeekTitle('');
+        onRefresh();
+      }
+    } catch (e) {
+      handleError({
+        message: '새로운 항목 생성이 실패했습니다. 관리자에게 문의 바랍니다.',
+      });
+    }
+  };
+
+  const modifyData = async () => {
+    try {
+      console.log('run2', modalTitle, weekTitle);
+      let doc = {...selectedDoc};
+      doc.weekName = weekTitle;
+      if (modalTitle === '주차이름 변경' && weekTitle) {
+        const mod = await refDB.doc(selectedDoc.id).set(doc);
+        console.log('title', mod);
+        setModal(false);
+        setWeekTitle('');
+        setSelectedDoc({});
+        onRefresh();
+      }
+    } catch (e) {
+      console.log('e', e);
+      handleError({
+        message: `${weekTitle} 이름변경을 실패했습니다. 관리자에게 문의 바랍니다.`,
+      });
+    }
+  };
+
+  const deleteData = async (id) => {
+    try {
+      await refDB.doc(id).delete();
+      console.log('delete');
+      setModal(false);
+      setWeekTitle('');
+      setSelectedDoc({});
+      onRefresh();
+    } catch (e) {
+      console.log('e', e);
+      handleError({
+        message: '삭제에 실패했습니다. 관리자에게 문의 바랍니다.',
+      });
+    }
+  };
+
   useEffect(() => {
     fetchData();
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
@@ -106,13 +170,11 @@ const WishListScreen = () => {
   //   fetchData();
   // }, [checkList, weeklyCheck]);
 
-  const removeItem = product_id => {
-    dispatch(removeWishList(product_id));
-  };
-
-  const onModal = (title, name) => {
+  const onModal = (title, name, doc = 0) => {
+    console.log('name: ', name);
     setModalTitle(title);
-    setModalName(name);
+    setWeekTitle(name);
+    setSelectedDoc(doc);
     setModal(!isModal);
   };
 
@@ -146,7 +208,7 @@ const WishListScreen = () => {
         )}
         renderHiddenItem={({item}) => (
           <View style={styles.viewSwiper}>
-            <ButtonSwiper onPress={() => removeItem(item.id)} />
+            <ButtonSwiper onPress={() => deleteData(item.id)} />
           </View>
         )}
         leftOpenValue={70}
@@ -181,7 +243,7 @@ const WishListScreen = () => {
           loading={false}
           title={'생성'}
           containerStyle={styles.marginBottom('big')}
-          onPress={() => onModal('생성', null)}
+          onPress={() => onModal('생성')}
         />
       </Container>
       <Modal
@@ -193,18 +255,17 @@ const WishListScreen = () => {
         <Container>
           <View style={styles.marginBottom('small')}>
             <Input
-              label={modalName || '예) 3월 1주차...'}
-              multiline
-              numberOfLines={1}
-              value={''}
-              onChangeText={value => this.setState({review: value})}
+              label={'예) 3월 1주차...'}
+              value={weekTitle}
+              onChangeText={value => setWeekTitle(value)}
             />
           </View>
           <Button
+            disabled={!weekTitle}
             loading={false}
-            title={'저장'}
+            title={modalTitle === '생성' ? '저장' : '수정'}
             containerStyle={styles.marginBottom('big')}
-            onPress={()=>{}}
+            onPress={modalTitle === '생성' ? createData : modifyData}
           />
         </Container>
       </Modal>

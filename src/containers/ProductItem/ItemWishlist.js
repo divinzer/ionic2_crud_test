@@ -22,14 +22,13 @@ const stockStatusList = ['instock', 'onbackorder'];
 const ItemWishlist = React.memo(props => {
   const {t} = useTranslation();
   const navigation = useNavigation();
-  const {item, style, configs, loading, addCart, onModal} = props;
-  const {weekName, type, isDeleted, hasFeedback, id, purchasable, stock_status} = item;
+  const {item, style, configs, loading, onModal} = props;
+  const {weekName, type, isDeleted, hasFeedback, id, kitchenMomo, writeenAt} = item;
   const goProductDetail = () =>
     navigation.navigate(mainStack.check_list, {
       item,
     });
 
-  const getAddToCart = () => addCart(id);
   const titleButton =
     type === SIMPLE ? t('common:text_add_cart') : t('common:text_choose_item');
   return (
@@ -77,7 +76,7 @@ const ItemWishlist = React.memo(props => {
                   name={'pencil'}
                   color={grey4}
                   onPress={() => {
-                    onModal('주차이름 변경', weekName);
+                    onModal('주차이름 변경', weekName, item);
                   }}
                   underlayColor={'transparent'}
                   // style={{marginRight: 10}}

@@ -26,11 +26,11 @@ export const isLogin = () => auth().get(`/v1/current`);
 //   ref.onSnapshot(querySnapshot => {
 //     const list = [];
 //     querySnapshot.forEach(doc => {
-//       const {weekName, ketchenMemo} = doc.data();
+//       const {weekName, kitchenMemo} = doc.data();
 //       list.push({
 //         id: doc.id,
 //         weekName,
-//         ketchenMemo,
+//         kitchenMemo,
 //       });
 //     });
 //     console.log('list', list);

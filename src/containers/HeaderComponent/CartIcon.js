@@ -63,7 +63,6 @@ class CartIcon extends React.Component<Props> {
 
   render() {
     const {iconProps, navigation} = this.props;
-    console.log('i', iconProps);
     // const heightBadge = 16;
 
     // const badgeStyle = {
