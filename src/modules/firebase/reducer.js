@@ -72,7 +72,6 @@ const firebaseReducer = produce((draft, action) => {
       draft.error = notificationMessage(payload);
       break;
     case Actions.CHANGE_CHECK_FEEDBACK:
-      console.log('pay', payload);
       const {name, value} = payload;
       const feedback = draft.checkList.find(list => list.checkName === name);
       feedback.feedback = value;

@@ -7,6 +7,7 @@ import Container from 'src/containers/Container';
 import CheckBox from 'src/components/checkbox/CheckBox';
 
 import {margin, padding} from 'src/components/config/spacing';
+import {red, black} from 'src/components/config/colors';
 import {mainStack} from 'src/config/navigator';
 
 const CheckListItem = ({data, theme, onChecked, fId}) => {
@@ -31,7 +32,9 @@ const CheckListItem = ({data, theme, onChecked, fId}) => {
       <TouchableOpacity onPress={goFeedback}>
         <Row style={styles.row}>
           <Col style={styles.center}>
-            <Text medium>{data.value}</Text>
+            <Text style={data.checked ? {color: red} : {color: black}} medium>
+              {data.value}
+            </Text>
           </Col>
           {/* <CheckBox colorThird style={styles.textCreateAt} theme={theme} /> */}
           <CheckBox colorThird onPress={onChecked} checked={data.checked} />

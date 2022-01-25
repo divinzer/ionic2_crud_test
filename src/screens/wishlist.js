@@ -3,13 +3,14 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 // import isEqual from 'lodash/isEqual';
+
 import NavigationServices from 'src/utils/navigation';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {StyleSheet, View, ActivityIndicator, RefreshControl} from 'react-native';
 import {Header, ThemedView, Modal} from 'src/components';
 import {SwipeListView} from 'react-native-swipe-list-view';
-import ProductItem from 'src/containers/ProductItem';
+import ItemWishlist from './ItemWishlist';
 import {TextHeader, CartIcon, IconHeader} from 'src/containers/HeaderComponent';
 import Empty from 'src/containers/Empty';
 import Button from 'src/containers/Button';
@@ -32,6 +33,9 @@ import {
 import {margin} from 'src/components/config/spacing';
 import {authStack, rootSwitch, mainStack} from '../config/navigator';
 
+import {LogBox} from 'react-native';
+LogBox.ignoreLogs(['Sending']);
+
 const stateSelector = createStructuredSelector({
   loading: loadingListSelector(),
   weeklyCheck: weeklyCheckSelector(),
@@ -43,6 +47,11 @@ const WishListScreen = () => {
   const {loading, weeklyCheck} = useSelector(stateSelector);
   // Set an initializing state whilst Firebase connects
   const [initializing, setInitializing] = useState(true);
+  const [checkItems, setCheckItems] = useState({
+    개인위생: {},
+    식재관리: {},
+    조리장위생: {},
+  });
   const [user, setUser] = useState(null);
   const [isModal, setModal] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -70,15 +79,38 @@ const WishListScreen = () => {
     setRefreshing(false);
   }, [refreshing]);
 
+  const fetchCheckItems = async () => {
+    try {
+      const CheckItemsRef = firestore()
+        .collection('checklist')
+        .doc('checkItems');
+      await CheckItemsRef.onSnapshot(documentSnapshot => {
+        const obj = documentSnapshot.data();
+        for (const item in documentSnapshot.data()['개인위생']) {
+          obj['개인위생'][item] = false;
+          obj['개인위생'].title = '키친 - 개인위생';
+        }
+        for (const item in documentSnapshot.data()['식재관리']) {
+          obj['식재관리'][item] = false;
+          obj['식재관리'].title = '키친 - 식재관리';
+        }
+        for (const item in documentSnapshot.data()['조리장위생']) {
+          obj['조리장위생'][item] = false;
+          obj['조리장위생'].title = '키친 - 조리장위생';
+        }
+        setCheckItems(obj);
+      });
+    } catch (e) {
+      // setLoading(false);
+    }
+  };
   const fetchData = async () => {
     dispatch({type: FETCH_WEEKLY_CHECK});
-    // console.log('run');
     try {
       await ref.onSnapshot((querySnapshot, err) => {
         const arr = [];
         if (querySnapshot) {
           querySnapshot.forEach(doc => {
-            // console.log('doc', doc);
             const {weekName, kitchenMemo, hasFeedback, isDeleted, writtenAt} = doc.data();
             arr.push({
               id: doc.id,
@@ -102,19 +134,24 @@ const WishListScreen = () => {
 
   const createData = async () => {
     try {
-      console.log('run');
+      // const batch = firestore().batch();
       if (modalTitle === '생성' && weekTitle) {
-        const add = await refDB.add({
+        const doc = await refDB.add({
           weekName: weekTitle,
           kitchenMemo: '',
           hasFeedback: false,
           isDeleted: false,
           writtenAt: Date(),
+          kitchen: [],
         });
-        console.log('title', add);
+        const feedbackItem = {개인위생: {}, 식재관리: {}, 조리장위생: {}};
+        const firstDoc = await doc.collection('kitchen').add({});
+        await doc.collection('kitchen').doc('checklist').set(checkItems);
+        await doc.collection('kitchen').doc('feedback').set(feedbackItem);
+        await firstDoc.delete();
         setModal(false);
         setWeekTitle('');
-        onRefresh();
+        fetchData();
       }
     } catch (e) {
       handleError({
@@ -125,35 +162,30 @@ const WishListScreen = () => {
 
   const modifyData = async () => {
     try {
-      console.log('run2', modalTitle, weekTitle);
       let doc = {...selectedDoc};
       doc.weekName = weekTitle;
       if (modalTitle === '주차이름 변경' && weekTitle) {
-        const mod = await refDB.doc(selectedDoc.id).set(doc);
-        console.log('title', mod);
+        await refDB.doc(selectedDoc.id).set(doc);
         setModal(false);
         setWeekTitle('');
         setSelectedDoc({});
-        onRefresh();
+        fetchData();
       }
     } catch (e) {
-      console.log('e', e);
       handleError({
         message: `${weekTitle} 이름변경을 실패했습니다. 관리자에게 문의 바랍니다.`,
       });
     }
   };
 
-  const deleteData = async (id) => {
+  const deleteData = async id => {
     try {
       await refDB.doc(id).delete();
-      console.log('delete');
       setModal(false);
       setWeekTitle('');
       setSelectedDoc({});
-      onRefresh();
+      fetchData();
     } catch (e) {
-      console.log('e', e);
       handleError({
         message: '삭제에 실패했습니다. 관리자에게 문의 바랍니다.',
       });
@@ -162,6 +194,7 @@ const WishListScreen = () => {
 
   useEffect(() => {
     fetchData();
+    fetchCheckItems();
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
   }, []);
@@ -171,7 +204,6 @@ const WishListScreen = () => {
   // }, [checkList, weeklyCheck]);
 
   const onModal = (title, name, doc = 0) => {
-    console.log('name: ', name);
     setModalTitle(title);
     setWeekTitle(name);
     setSelectedDoc(doc);
@@ -198,7 +230,7 @@ const WishListScreen = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         renderItem={({item, index}) => (
-          <ProductItem
+          <ItemWishlist
             item={item}
             key={index}
             style={index === 0 ? styles.firstItem : undefined}

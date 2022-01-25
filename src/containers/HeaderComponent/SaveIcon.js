@@ -20,7 +20,7 @@ type Props = {
   navigation: ScreenProps,
 };
 
-class CartIcon extends React.Component<Props> {
+class SaveIcon extends React.Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
@@ -79,7 +79,7 @@ class CartIcon extends React.Component<Props> {
             value={count}
           /> */}
         </Animated.View>
-        <Icon color={black} type="font-awesome" name={'sign-out'} size={20} underlayColor={'transparent'} />
+        <Icon color={black} type="font-awesome" name={'save'} size={20} underlayColor={'transparent'} />
       </TouchableOpacity>
     );
   }
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
 });
-CartIcon.defaultProps = {
+SaveIcon.defaultProps = {
   count: 0,
   isAnimated: false,
   iconProps: {},
@@ -106,9 +106,9 @@ CartIcon.defaultProps = {
 //   configs: configsSelector(state),
 // });
 
-const CartIconComponent = CartIcon;
+const SaveIconComponent = SaveIcon;
 
 export default function (props) {
   const navigation = useNavigation();
-  return <CartIconComponent {...props} navigation={navigation} />;
+  return <SaveIconComponent {...props} navigation={navigation} />;
 }
