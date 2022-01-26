@@ -33,11 +33,11 @@ const stateSelector = createStructuredSelector({
 const FeedbackScreen = props => {
   const {route} = props;
   console.log('route', route);
-  const {data} = route.params || '';
+  const {item} = route.params || '';
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const {loading, checkList} = useSelector(stateSelector);
-  const [checked, setChecked] = useState(data.checked);
+  const [checked, setChecked] = useState(item.checked);
   const [imageUrl, setImageUrl] = useState([]);
 
   let defaultImage = '';
@@ -53,7 +53,7 @@ const FeedbackScreen = props => {
   };
 
   const fetchImage = async () => {
-    const {checkName} = data;
+    const {checkName} = item;
     // const media = '/feedbackImage/50297A9880424B81982/kitchen/ingredient7.jpg';
     const media = '/feedbackImage/50297A98-8042-4B81-9828-E59F7E3E18CD/kitchen/unnamed.jpg';
     const media2 = '/feedbackImage/50297A98-8042-4B81-9828-E59F7E3E18CD/kitchen/ingredient7.jpg';
@@ -152,7 +152,7 @@ const FeedbackScreen = props => {
               <Row style={styles.row}>
                 <CheckBox colorThird onPress={onChecked} checked={checked} />
                 <Col style={styles.center}>
-                  <Text medium>{data.value}</Text>
+                  <Text medium>{item.value}</Text>
                 </Col>
                 {/* <CheckBox colorThird style={styles.textCreateAt} theme={theme} /> */}
               </Row>
@@ -165,7 +165,7 @@ const FeedbackScreen = props => {
                 label={'피드백을 여기에 작성해 주세요.'}
                 multiline
                 numberOfLines={8}
-                value={data.feedback}
+                value={item.feedback}
                 onChangeText={value => this.setState({review: value})}
               />
             </View>

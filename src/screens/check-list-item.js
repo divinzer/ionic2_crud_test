@@ -12,17 +12,13 @@ import {mainStack} from 'src/config/navigator';
 
 const CheckListItem = React.memo(props => {
   const navigation = useNavigation();
-  const {item, onChecked, fId} = props;
+  const {item, onChecked, fId, onModal} = props;
   const goFeedback = () =>
     navigation.navigate(mainStack.feedback, {
       item,
       fId,
     });
 
-  // if (!item) {
-  //   return null;
-  // }
-  
   return (
     <ThemeConsumer>
       {({theme}) => (
@@ -34,7 +30,9 @@ const CheckListItem = React.memo(props => {
               borderColor: theme.colors.border,
             },
           ]}>
-          <TouchableOpacity onPress={goFeedback}>
+          <TouchableOpacity
+            onPress={goFeedback}
+            onLongPress={() => onModal('edit')}>
             <Row style={styles.row}>
               <Col style={styles.center}>
                 <Text style={item.checked ? {color: red} : {color: black}} medium>

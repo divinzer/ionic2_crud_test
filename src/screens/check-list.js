@@ -61,8 +61,9 @@ const CheckListScreen = props => {
   const [title1, setTitle1] = useState('');
   const [title2, setTitle2] = useState('');
   const [feedbackDesc, setFeedbackDesc] = useState('');
+  const [newName, setNewName] = useState('');
   const {loading, loading2, checkList} = useSelector(stateSelector);
-  const [isModal, setModal] = useState(false);
+  const [isModal, setModal] = useState('');
   const [pending, setPending] = useState(false);
   const kitchenRef = firestore()
     .collection('weeklyCheck')
@@ -70,7 +71,6 @@ const CheckListScreen = props => {
     .collection('kitchen');
   const checklistRef = firestore().collection('checklistClone').doc('checkItems');
   const onChecked = async ck => {
-    console.log('ck: ', ck);
     let selected = '식재관리';
     if (includes(ck, 'hygiene')) {
       selected = '개인위생';
@@ -79,7 +79,6 @@ const CheckListScreen = props => {
     } else if (includes(ck, 'kitchen')) {
       selected = '조리장위생';
     }
-    console.log('s00', kitchenCheckItems[selected]);
     const checked = !kitchenCheckItems[selected][ck];
     const newCheckItem = {
       ...kitchenCheckItems,
@@ -95,10 +94,10 @@ const CheckListScreen = props => {
     }
   };
 
-  const onModal = (title, name) => {
-    // setModalTitle(title);
-    // setModalName(name);
-    setModal(!isModal);
+  const onModal = type => {
+    console.log('type: ', type);
+    // type: new, title, item
+    setModal(type);
   };
 
   const fetchKitchenList = async () => {
@@ -159,17 +158,10 @@ const CheckListScreen = props => {
   };
 
   const fetchCheckList = async () => {
-    console.log('run',  await firestore()
-    .collection('checklistClone')
-    .doc('checkItems')
-    .get()
-    .then(documentSnapshot => documentSnapshot.data())
-    );
     let arr0 = [];
     let arr1 = [];
     let arr2 = [];
     let total = [];
-    let prevItem = '';
     dispatch({type: FETCH_CHECK_LIST});
     try {
       await checklistRef.get().then(documentSnapshot => {
@@ -177,7 +169,6 @@ const CheckListScreen = props => {
           setCheckItems(documentSnapshot.data());
           for (const item in documentSnapshot.data()['개인위생']) {
             let value = documentSnapshot.data()['개인위생'][item];
-            console.log('value: ', value);
             if (!includes(value, 'clear')) {
               arr0.push({
                 checkName: item,
@@ -245,49 +236,36 @@ const CheckListScreen = props => {
     }
   };
 
-  const modifyData = async () => {
+  const modifyData = async (item, value) => {
+    dispatch({type: FETCH_CHECK_LIST});
+    // setPending(true);
+    let selected = '식재관리';
+    if (includes(item.checkName, 'hygiene')) {
+      selected = '개인위생';
+    } else if (includes(item.checkName, 'ingredient')) {
+      selected = '식재관리';
+    } else if (includes(item.checkName, 'kitchen')) {
+      selected = '조리장위생';
+    }
+
     try {
-      let doc = {...selectedDoc};
-      doc.weekName = weekTitle;
-      if (modalTitle === '주차이름 변경' && weekTitle) {
-        await kitchenRef.doc(selectedDoc.id).set(doc);
-        // setModal(false);
-        // setWeekTitle('');
-        // setSelectedDoc({});
-        fetchCheckList();
-      }
-    } catch (e) {
-      handleError({
-        message: `${weekTitle} 이름변경을 실패했습니다. 관리자에게 문의 바랍니다.`,
+      // dispatch({type: CHANGE_CHECK_LIST, payload: item.checkName});
+      await checklistRef.update({
+        [selected]: {
+          ...checkItems[selected],
+          [item.checkName]: value,
+        },
       });
+      fetchCheckList();
+    } catch (e) {
+      dispatch({type: FETCH_CHECK_LIST_ERROR});
+      console.log('e', e);
     }
   };
-
-  // const deleteData = async item => {
-  //   console.log('item: ', item);
-  //   const newCheckItem = {
-  //     ...kitchenCheckItems,
-  //     [selected]: {...kitchenCheckItems[selected], [ck]: checked},
-  //   };
-  //   let data = {...item};
-  //   data.isDeleted = true;
-  //   try {
-  //     // await checklistRef.update(data);
-  //     // setModal(false);
-  //     // setWeekTitle('');
-  //     // setSelectedDoc({});
-  //     fetchCheckList();
-  //   } catch (e) {
-  //     handleError({
-  //       message: '삭제에 실패했습니다. 관리자에게 문의 바랍니다.',
-  //     });
-  //   }
-  // };
 
   const deleteData = async item => {
     dispatch({type: FETCH_CHECK_LIST});
     // setPending(true);
-    console.log('item: ', item);
     let selected = '식재관리';
     if (includes(item.checkName, 'hygiene')) {
       selected = '개인위생';
@@ -305,15 +283,9 @@ const CheckListScreen = props => {
           [item.checkName]: 'clear-' + item.value,
         },
       });
-      // await setCheckItems(newCheckItem);
       fetchCheckList();
-      // setTimeout(() => {
-      // setPending(false);
-      // }, 2000);
-      // console.log('chekclist', checkList);
     } catch (e) {
       dispatch({type: FETCH_CHECK_LIST_ERROR});
-      // await setPending(false);
       console.log('e', e);
     }
   };
@@ -341,7 +313,7 @@ const CheckListScreen = props => {
               type="font-awesome"
               name={'plus-circle'}
               color={grey4}
-              onPress={onModal}
+              onPress={() => onModal('new')}
               underlayColor={'transparent'}
               containerStyle={{paddingRight: 10, paddingTop: 10}}
               // style={{paddingRight: 100}}
@@ -365,7 +337,7 @@ const CheckListScreen = props => {
               type="font-awesome"
               name={'plus-circle'}
               color={grey4}
-              onPress={onModal}
+              onPress={() => onModal('edit')}
               underlayColor={'transparent'}
               containerStyle={{paddingRight: 10, paddingTop: 10}}
               // style={{paddingRight: 100}}
@@ -389,7 +361,7 @@ const CheckListScreen = props => {
               type="font-awesome"
               name={'plus-circle'}
               color={grey4}
-              onPress={onModal}
+              onPress={() => onModal('title')}
               underlayColor={'transparent'}
               containerStyle={{paddingRight: 10, paddingTop: 10}}
               // style={{paddingRight: 100}}
@@ -405,6 +377,8 @@ const CheckListScreen = props => {
           fId={fId}
           style={{height: 30}}
           onChecked={() => onChecked(item.checkName)}
+          onEdit={modifyData}
+          onModal={onModal}
         />
       );
     }
@@ -416,7 +390,7 @@ const CheckListScreen = props => {
         <Input
           label={'피드백을 여기에 작성해 주세요.'}
           multiline
-          numberOfLines={8}
+          numberOfLines={3}
           value={feedbackDesc}
           onChangeText={value => setFeedbackDesc(value)}
         />
@@ -469,27 +443,36 @@ const CheckListScreen = props => {
         renderData(checkList)
       )} */}
       {renderData(checkList)}
+      {footer}
       <Modal
-        visible={isModal}
+        visible={isModal === 'new' || isModal === 'title' || isModal === 'edit'}
         transparent
         setModalVisible={value => setModal(value)}
-        ratioHeight={0.5}
-        title={'체크 아이템 내용 추가'}>
+        ratioHeight={0.3}
+        title={
+          isModal === 'new'
+            ? '체크 아이템 내용 추가'
+            : isModal === 'title'
+            ? '제목 수정'
+            : isModal === 'edit'
+            ? '항목 수정'
+            : ''
+        }>
         <Container>
           <View style={styles.marginBottom('small')}>
             <Input
               label={'아이템 내용을 기입해주세요.'}
-              multiline
-              numberOfLines={8}
-              value={'feedbackDesc'}
-              onChangeText={value => {}}
+              value={newName}
+              onChangeText={value => setNewName(value)}
             />
           </View>
           <Button
             loading={false}
             title={'추가'}
             containerStyle={styles.marginBottom('big')}
-            onPress={()=>{}}
+            onPress={()=>{}
+            // editItem()
+            }
           />
         </Container>
       </Modal>
