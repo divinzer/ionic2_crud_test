@@ -179,7 +179,7 @@ export const darkColors = {
   // ButtonSwiper
   ButtonSwiper: {
     like: {
-      backgroundColor: grey1,
+      backgroundColor: blue,
       color: black,
     },
     unlike: {

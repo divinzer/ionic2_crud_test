@@ -3,21 +3,16 @@ import firestore from '@react-native-firebase/firestore';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {sortBy, merge, includes} from 'lodash';
-import {StyleSheet, ActivityIndicator, View} from 'react-native';
-import {SwipeListView} from 'react-native-swipe-list-view';
-import Empty from 'src/containers/Empty';
+import {StyleSheet, FlatList, View} from 'react-native';
 import {Row, Col} from 'src/containers/Gird';
 import {Header, Icon, ThemedView, Text, Modal} from 'src/components';
 import Input from 'src/containers/input/Input';
 import InputBasic from 'src/containers/input/InputBasic';
 import Button from 'src/containers/Button';
 import Container from 'src/containers/Container';
-import ButtonSwiper from 'src/containers/ButtonSwiper';
-import ButtonLeftSwiper from 'src/containers/ButtonLeftSwiper';
 import CheckListItem from './check-list-item';
 import {TextHeader, SaveIcon, IconHeader} from 'src/containers/HeaderComponent';
-import {grey4, grey6, blue} from 'src/components/config/colors';
-import {handleError} from 'src/utils/error';
+import {grey4, grey6} from 'src/components/config/colors';
 
 // import {fetchChecklist} from 'src/modules/firebase/actions';
 import {
@@ -31,13 +26,11 @@ import {
 
 import {
   loadingListSelector,
-  loadingCheckListSelector,
   checkListSelector,
 } from 'src/modules/firebase/selectors';
 
 const stateSelector = createStructuredSelector({
   loading: loadingListSelector(),
-  loading2: loadingCheckListSelector(),
   checkList: checkListSelector(),
 });
 
@@ -47,11 +40,6 @@ const CheckListScreen = props => {
   const {route} = props;
   const fId = route.params.item.id;
   const dispatch = useDispatch();
-  const [kitchenCheckItems, setKitchenCheckItems] = useState({
-    개인위생: {},
-    식재관리: {},
-    조리장위생: {},
-  });
   const [checkItems, setCheckItems] = useState({
     개인위생: {},
     식재관리: {},
@@ -61,14 +49,17 @@ const CheckListScreen = props => {
   const [title1, setTitle1] = useState('');
   const [title2, setTitle2] = useState('');
   const [feedbackDesc, setFeedbackDesc] = useState('');
-  const {loading, loading2, checkList} = useSelector(stateSelector);
+  const {loading, checkList} = useSelector(stateSelector);
   const [isModal, setModal] = useState(false);
-  const [pending, setPending] = useState(false);
   const kitchenRef = firestore()
     .collection('weeklyCheck')
     .doc(route.params.item.id)
     .collection('kitchen');
-  const checklistRef = firestore().collection('checklistClone').doc('checkItems');
+  let arr0 = [];
+  let arr1 = [];
+  let arr2 = [];
+  let total = [];
+
   const onChecked = async ck => {
     console.log('ck: ', ck);
     let selected = '식재관리';
@@ -79,17 +70,17 @@ const CheckListScreen = props => {
     } else if (includes(ck, 'kitchen')) {
       selected = '조리장위생';
     }
-    console.log('s00', kitchenCheckItems[selected]);
-    const checked = !kitchenCheckItems[selected][ck];
+    console.log('s00', checkItems[selected]);
+    const checked = !checkItems[selected][ck];
     const newCheckItem = {
-      ...kitchenCheckItems,
-      [selected]: {...kitchenCheckItems[selected], [ck]: checked},
+      ...checkItems,
+      [selected]: {...checkItems[selected], [ck]: checked},
     };
 
     try {
       dispatch({type: CHANGE_CHECK_LIST, payload: ck});
       await kitchenRef.doc('checklist').set(newCheckItem);
-      await setKitchenCheckItems(newCheckItem);
+      await setCheckItems(newCheckItem);
     } catch (e) {
       console.log('e', e);
     }
@@ -106,6 +97,7 @@ const CheckListScreen = props => {
       // setLoading(true);
       await kitchenRef.get().then(documentSnapshot => {
         const feedback = documentSnapshot.docs[1].data();
+        console.log('feedback: ', feedback);
         const obj = merge(
           feedback['개인위생'],
           feedback['식재관리'],
@@ -119,8 +111,7 @@ const CheckListScreen = props => {
         }
 
         // chkeck in checked
-        setKitchenCheckItems(documentSnapshot.docs[0].data());
-
+        setCheckItems(documentSnapshot.docs[0].data());
         for (const item in documentSnapshot.docs[0].data()['개인위생']) {
           const value = documentSnapshot.docs[0].data()['개인위생'][item];
           if (value === true) {
@@ -159,25 +150,17 @@ const CheckListScreen = props => {
   };
 
   const fetchCheckList = async () => {
-    console.log('run',  await firestore()
-    .collection('checklistClone')
-    .doc('checkItems')
-    .get()
-    .then(documentSnapshot => documentSnapshot.data())
-    );
-    let arr0 = [];
-    let arr1 = [];
-    let arr2 = [];
-    let total = [];
-    let prevItem = '';
     dispatch({type: FETCH_CHECK_LIST});
     try {
-      await checklistRef.get().then(documentSnapshot => {
+      // let ii = 0;
+      // ii++;
+      // console.log(ii);
+      // setLoading(true);
+      const ref = firestore().collection('checklist').doc('checkItems');
+      await ref.onSnapshot(documentSnapshot => {
         if (documentSnapshot !== null) {
-          setCheckItems(documentSnapshot.data());
           for (const item in documentSnapshot.data()['개인위생']) {
             let value = documentSnapshot.data()['개인위생'][item];
-            console.log('value: ', value);
             if (!includes(value, 'clear')) {
               arr0.push({
                 checkName: item,
@@ -190,12 +173,7 @@ const CheckListScreen = props => {
           arr0 = sortBy(arr0, function (o) {
             return Number(o.checkName.replace('hygiene', ''));
           });
-          arr0.unshift({
-            checkName: 'hygiene-1',
-            value: '개인위생',
-            checked: false,
-            feedback: null,
-          });
+          // console.log('data2', documentSnapshot);
           for (const item in documentSnapshot.data()['식재관리']) {
             let value = documentSnapshot.data()['식재관리'][item];
             if (!includes(value, 'clear')) {
@@ -205,16 +183,11 @@ const CheckListScreen = props => {
                 checked: false,
                 feedback: null,
               });
-            }
+           }
           }
+          // console.log('data3', documentSnapshot);
           arr1 = sortBy(arr1, function (o) {
             return Number(o.checkName.replace('ingredient', ''));
-          });
-          arr1.unshift({
-            checkName: 'ingredient-1',
-            value: '',
-            checked: false,
-            feedback: null,
           });
           for (const item in documentSnapshot.data()['조리장위생']) {
             let value = documentSnapshot.data()['조리장위생'][item];
@@ -230,12 +203,6 @@ const CheckListScreen = props => {
           arr2 = sortBy(arr2, function (o) {
             return Number(o.checkName.replace('kitchen', ''));
           });
-          arr2.unshift({
-            checkName: 'kitchen-1',
-            value: '',
-            checked: false,
-            feedback: null,
-          });
           total = arr0.concat(arr1, arr2);
           dispatch({type: FETCH_CHECK_LIST_SUCCESS, payload: total});
         }
@@ -245,87 +212,13 @@ const CheckListScreen = props => {
     }
   };
 
-  const modifyData = async () => {
-    try {
-      let doc = {...selectedDoc};
-      doc.weekName = weekTitle;
-      if (modalTitle === '주차이름 변경' && weekTitle) {
-        await kitchenRef.doc(selectedDoc.id).set(doc);
-        // setModal(false);
-        // setWeekTitle('');
-        // setSelectedDoc({});
-        fetchCheckList();
-      }
-    } catch (e) {
-      handleError({
-        message: `${weekTitle} 이름변경을 실패했습니다. 관리자에게 문의 바랍니다.`,
-      });
-    }
-  };
-
-  // const deleteData = async item => {
-  //   console.log('item: ', item);
-  //   const newCheckItem = {
-  //     ...kitchenCheckItems,
-  //     [selected]: {...kitchenCheckItems[selected], [ck]: checked},
-  //   };
-  //   let data = {...item};
-  //   data.isDeleted = true;
-  //   try {
-  //     // await checklistRef.update(data);
-  //     // setModal(false);
-  //     // setWeekTitle('');
-  //     // setSelectedDoc({});
-  //     fetchCheckList();
-  //   } catch (e) {
-  //     handleError({
-  //       message: '삭제에 실패했습니다. 관리자에게 문의 바랍니다.',
-  //     });
-  //   }
-  // };
-
-  const deleteData = async item => {
-    dispatch({type: FETCH_CHECK_LIST});
-    // setPending(true);
-    console.log('item: ', item);
-    let selected = '식재관리';
-    if (includes(item.checkName, 'hygiene')) {
-      selected = '개인위생';
-    } else if (includes(item.checkName, 'ingredient')) {
-      selected = '식재관리';
-    } else if (includes(item.checkName, 'kitchen')) {
-      selected = '조리장위생';
-    }
-
-    try {
-      // dispatch({type: CHANGE_CHECK_LIST, payload: item.checkName});
-      await checklistRef.update({
-        [selected]: {
-          ...checkItems[selected],
-          [item.checkName]: 'clear-' + item.value,
-        },
-      });
-      // await setCheckItems(newCheckItem);
-      fetchCheckList();
-      // setTimeout(() => {
-      // setPending(false);
-      // }, 2000);
-      // console.log('chekclist', checkList);
-    } catch (e) {
-      dispatch({type: FETCH_CHECK_LIST_ERROR});
-      // await setPending(false);
-      console.log('e', e);
-    }
-  };
-
   useEffect(() => {
     fetchCheckList();
     fetchKitchenList();
   }, [dispatch]);
 
-  const itemList = (item, index) => {
-    // console.log('checkList: ', checkList);
-    if (item.checkName === 'hygiene-1') {
+  const itemNotification = ({item}) => {
+    if (item.checkName === 'hygiene0') {
       return (
         <>
           <Row style={styles.row}>
@@ -347,9 +240,15 @@ const CheckListScreen = props => {
               // style={{paddingRight: 100}}
             />
           </Row>
+          <CheckListItem
+            item={item}
+            fId={fId}
+            style={{height: 30}}
+            onChecked={() => onChecked(item.checkName)}
+          />
         </>
       );
-    } else if (item.checkName === 'ingredient-1') {
+    } else if (item.checkName === 'ingredient0') {
       return (
         <>
           <Row style={styles.row}>
@@ -371,9 +270,15 @@ const CheckListScreen = props => {
               // style={{paddingRight: 100}}
             />
           </Row>
+          <CheckListItem
+            item={item}
+            fId={fId}
+            style={{height: 30}}
+            onChecked={() => onChecked(item.checkName)}
+          />
         </>
       );
-    } else if (item.checkName === 'kitchen-1') {
+    } else if (item.checkName === 'kitchen0') {
       return (
         <>
           <Row style={styles.row}>
@@ -395,12 +300,17 @@ const CheckListScreen = props => {
               // style={{paddingRight: 100}}
             />
           </Row>
+          <CheckListItem
+            item={item}
+            fId={fId}
+            style={{height: 30}}
+            onChecked={() => onChecked(item.checkName)}
+          />
         </>
       );
     } else {
       return (
         <CheckListItem
-          key={index}
           item={item}
           fId={fId}
           style={{height: 30}}
@@ -429,30 +339,6 @@ const CheckListScreen = props => {
       />
     </Container>
   );
-
-  const renderData = data => (
-    <SwipeListView
-      // useFlatList
-      keyExtractor={item => item.checkName}
-      data={data}
-      // refreshControl={
-      //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      // }
-      renderItem={({item, index}) => itemList(item, index)}
-      renderHiddenItem={({item}) => (
-        <View style={styles.viewSwiper}>
-          <ButtonLeftSwiper icon={'like'} onPress={() => deleteData(item.id)} />
-          <ButtonSwiper onPress={() => deleteData(item)} />
-        </View>
-      )}
-      leftOpenValue={70}
-      rightOpenValue={-70}
-      disableLeftSwipe={false}
-      disableRightSwipe={true}
-    />
-  );
-
-  // if (loading || loading2) return null;
   return (
     <ThemedView isFullView>
       <Header
@@ -461,14 +347,13 @@ const CheckListScreen = props => {
         // centerComponent={<TextHeader title={route.params.weekName} />}
         rightComponent={<SaveIcon />}
       />
-      {/* {loading || loading2 ? (
-        <View style={styles.viewLoading}>
-          <ActivityIndicator size="small" />
-        </View>
-      ) : (
-        renderData(checkList)
-      )} */}
-      {renderData(checkList)}
+      <FlatList
+        data={checkList}
+        keyExtractor={item => `${item.checkName}`}
+        renderItem={itemNotification}
+        ListFooterComponentStyle={<View style={styles.footer} />}
+        ListFooterComponent={footer}
+      />
       <Modal
         visible={isModal}
         transparent
@@ -526,7 +411,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 0,
     marginRight: 0,
-    // marginBottom: margin.large,
+    marginBottom: margin.large,
     backgroundColor: grey6,
     height: 40,
   },
@@ -547,16 +432,6 @@ const styles = StyleSheet.create({
   }),
   footer: {
     marginBottom: margin.large,
-  },
-  viewSwiper: {
-    flex: 1,
-    justifyContent: 'space-between',
-    height: '100%',
-    width: '100%',
-    flexDirection: 'row',
-  },
-  firstItem: {
-    borderTopWidth: 1,
   },
 });
 

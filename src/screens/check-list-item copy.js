@@ -12,7 +12,7 @@ import {mainStack} from 'src/config/navigator';
 
 const CheckListItem = React.memo(props => {
   const navigation = useNavigation();
-  const {item, onChecked, fId} = props;
+  const {item, theme, onChecked, fId} = props;
   const goFeedback = () =>
     navigation.navigate(mainStack.feedback, {
       item,
@@ -22,7 +22,6 @@ const CheckListItem = React.memo(props => {
   // if (!item) {
   //   return null;
   // }
-  
   return (
     <ThemeConsumer>
       {({theme}) => (

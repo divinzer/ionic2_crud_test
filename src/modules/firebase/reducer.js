@@ -52,6 +52,7 @@ const firebaseReducer = produce((draft, action) => {
       draft.error = initError;
       break;
     case Actions.FETCH_CHECK_LIST_SUCCESS:
+      draft.checkList = [];
       draft.checkList = payload;
       draft.loading = false;
       break;

@@ -178,9 +178,13 @@ const WishListScreen = () => {
     }
   };
 
-  const deleteData = async id => {
+  const deleteData = async item => {
+    console.log('id: ', item);
+    let data = {...item};
+    data.isDeleted = true;
     try {
-      await refDB.doc(id).delete();
+      // await refDB.doc(id).delete();
+      await refDB.doc(item.id).update({isDeleted: true});
       setModal(false);
       setWeekTitle('');
       setSelectedDoc({});
@@ -240,7 +244,7 @@ const WishListScreen = () => {
         )}
         renderHiddenItem={({item}) => (
           <View style={styles.viewSwiper}>
-            <ButtonSwiper onPress={() => deleteData(item.id)} />
+            <ButtonSwiper onPress={() => deleteData(item)} />
           </View>
         )}
         leftOpenValue={70}

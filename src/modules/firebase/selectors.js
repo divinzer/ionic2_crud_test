@@ -25,6 +25,9 @@ export const loadingListSelector = () =>
 export const checkSelector = () =>
   createSelector(firebase, data => data.check);
 
+export const loadingCheckListSelector = () =>
+  createSelector(firebase, data => data.loading);
+
 export const checkListSelector = () =>
   createSelector(firebase, data => data.checkList);
 

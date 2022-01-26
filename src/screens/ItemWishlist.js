@@ -11,12 +11,12 @@ import {configsSelector} from 'src/modules/common/selectors';
 import {mainStack} from 'src/config/navigator';
 import {withAddToCart} from 'src/hoc/hoc-add-to-card';
 
-import {SIMPLE} from 'src/config/product';
+// import {SIMPLE} from 'src/config/product';
 import {padding, margin} from 'src/components/config/spacing';
 import {sizes} from 'src/components/config/fonts';
 import {white, black, orange, grey4} from 'src/components/config/colors';
 
-const stockStatusList = ['instock', 'onbackorder'];
+// const stockStatusList = ['instock', 'onbackorder'];
 
 const ItemWishlist = React.memo(props => {
   const {t} = useTranslation();
@@ -28,8 +28,8 @@ const ItemWishlist = React.memo(props => {
       item,
     });
 
-  const titleButton =
-    type === SIMPLE ? t('common:text_add_cart') : t('common:text_choose_item');
+  // const titleButton =
+  //   type === SIMPLE ? t('common:text_add_cart') : t('common:text_choose_item');
   return (
     <ThemeConsumer>
       {({theme}) => (
