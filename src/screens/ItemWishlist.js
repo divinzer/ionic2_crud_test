@@ -23,7 +23,7 @@ const ItemWishlist = React.memo(props => {
   const navigation = useNavigation();
   const {item, style, configs, loading, onModal} = props;
   const {weekName, type, isDeleted, hasFeedback, id, kitchenMomo, writeenAt} = item;
-  const goProductDetail = () =>
+  const goCheckList = () =>
     navigation.navigate(mainStack.check_list, {
       item,
     });
@@ -41,7 +41,7 @@ const ItemWishlist = React.memo(props => {
               {borderColor: theme.colors.border},
               style && style,
             ]}
-            onPress={goProductDetail}>
+            onPress={goCheckList}>
             {/* <Image
               source={
                 images && images[0]
@@ -92,7 +92,7 @@ const ItemWishlist = React.memo(props => {
                   titleStyle={styles.titleButton}
                   size={'small'}
                   loading={loading}
-                  onPress={type === SIMPLE ? getAddToCart : goProductDetail}
+                  onPress={type === SIMPLE ? getAddToCart : goCheckList}
                 />
               ) : null} */}
             </View>

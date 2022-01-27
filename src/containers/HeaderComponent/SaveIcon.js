@@ -79,7 +79,7 @@ class SaveIcon extends React.Component<Props> {
             value={count}
           /> */}
         </Animated.View>
-        <Icon color={black} type="font-awesome" name={'save'} size={20} underlayColor={'transparent'} />
+        <Icon color={black} type="font-awesome" name={'comment'} size={20} underlayColor={'transparent'} />
       </TouchableOpacity>
     );
   }

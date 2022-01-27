@@ -1,10 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import {utils} from '@react-native-firebase/app';
+import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {useNavigation} from '@react-navigation/native';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {View, ScrollView, Image, KeyboardAvoidingView} from 'react-native';
+import {sortBy, merge, includes} from 'lodash';
 import {Header, Text, ThemedView} from 'src/components';
 import {Row, Col} from 'src/containers/Gird';
 import CheckBox from 'src/components/checkbox/CheckBox';
@@ -16,39 +18,108 @@ import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
 import {grey4, grey6} from 'src/components/config/colors';
 
 import {
-  FETCH_CHECK_ERROR,
   CHANGE_CHECK_LIST,
+  CHANGE_CHECK_LIST_SUCCESS,
+  CHANGE_CHECK_LIST_ERROR,
+  CHANGE_CHECK_FEEDBACK,
 } from 'src/modules/firebase/constants';
 
 import {
-  checkSelector,
+  loadingCheckListSelector,
+  checkListSelector,
 } from 'src/modules/firebase/selectors';
 
 import {margin} from 'src/components/config/spacing';
 
 const stateSelector = createStructuredSelector({
-  checkList: checkSelector(),
+  loading: loadingCheckListSelector(),
+  checkList: checkListSelector(),
 });
 
 const FeedbackScreen = props => {
-  const {route} = props;
-  console.log('route', route);
-  const {item} = route.params || '';
+  const {item, fId, kitchenCheckItems} = props.route.params || '';
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const {loading, checkList} = useSelector(stateSelector);
   const [checked, setChecked] = useState(item.checked);
+  const [feedback, setFeedback] = useState(item.feedback);
   const [imageUrl, setImageUrl] = useState([]);
 
+  const weeklyRef = firestore().collection('weeklyCheck').doc(fId);
+
   let defaultImage = '';
-  const onChecked = () => {
-    setChecked(!checked);
+  const onChecked = async () => {
+    dispatch({type: CHANGE_CHECK_LIST});
+    let selected = '식재관리';
+    if (includes(item.checkName, 'hygiene')) {
+      selected = '개인위생';
+    } else if (includes(item.checkName, 'ingredient')) {
+      selected = '식재관리';
+    } else if (includes(item.checkName, 'kitchen')) {
+      selected = '조리장위생';
+    }
+    // const checked = !kitchenCheckItems[selected][ck];
+
+    const newCheckItem = {
+      ...kitchenCheckItems,
+      [selected]: {
+        ...kitchenCheckItems[selected],
+        [item.checkName]: !item.checked,
+      },
+    };
+
+    try {
+      dispatch({
+        type: CHANGE_CHECK_LIST_SUCCESS,
+        payload: {name: item.checkName, value: !item.checked},
+      });
+      await weeklyRef
+        .collection('kitchen')
+        .doc('checklist')
+        .update(newCheckItem);
+      // setKitchenCheckItems(newCheckItem);
+      setChecked(!checked);
+    } catch (e) {
+      dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
+      console.log('e', e);
+    }
   };
 
-  const addReview = () => {
-    const {product_id} = this.state;
-    if (product_id) {
-      dispatch(addReview(this.state, () => navigation.goBack()));
+  const onFeedback = async () => {
+    dispatch({type: CHANGE_CHECK_LIST});
+    let selected = '식재관리';
+    if (includes(item.checkName, 'hygiene')) {
+      selected = '개인위생';
+    } else if (includes(item.checkName, 'ingredient')) {
+      selected = '식재관리';
+    } else if (includes(item.checkName, 'kitchen')) {
+      selected = '조리장위생';
+    }
+    // const checked = !kitchenCheckItems[selected][ck];
+
+    try {
+      dispatch({
+        type: CHANGE_CHECK_FEEDBACK,
+        payload: {name: item.checkName, value: feedback},
+      });
+      const totalFeedback = await weeklyRef
+        .collection('kitchen')
+        .doc('feedback')
+        .get()
+        .then(documentSnapshot => documentSnapshot.data());
+
+      const newFeedback = await {
+        ...totalFeedback,
+        [selected]: {
+          ...totalFeedback[selected],
+          [item.checkName]: feedback,
+        },
+      };
+
+      await weeklyRef.collection('kitchen').doc('feedback').update(newFeedback);
+    } catch (e) {
+      dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
+      console.log('e', e);
     }
   };
 
@@ -115,65 +186,64 @@ const FeedbackScreen = props => {
         <ScrollView>
           <Container>
             <View style={styles.viewContent}>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={true}
-                style={styles.scroll}>
-                <Image
-                  source={require('src/assets/images/pDefault.png')}
-                  resizeMode="stretch"
-                  style={[styles.image, styles.marginBottom('small')]}
-                />
-                <Image
-                  source={{uri: imageUrl[0]}}
-                  resizeMode="stretch"
-                  style={[styles.image, styles.marginBottom('small')]}
-                />
-                <Image
-                  source={{uri: imageUrl[1]}}
-                  resizeMode="stretch"
-                  style={[styles.image, styles.marginBottom('small')]}
-                />
-                {/* <ChooseItem
-                  key={'1'}
-                  item={'1'}
-                  onPress={() => {}}
-                  active={true}
-                  topElement={topElement}
-                  containerStyle={styles.item}
-                /> */}
-                {/* 
-                <Image
-                  source={require('src/assets/images/pDefault.png')}
-                  resizeMode="stretch"
-                  style={[styles.image, styles.marginBottom('small')]}
-                /> */}
-              </ScrollView>
               <Row style={styles.row}>
                 <CheckBox colorThird onPress={onChecked} checked={checked} />
                 <Col style={styles.center}>
                   <Text medium>{item.value}</Text>
                 </Col>
-                {/* <CheckBox colorThird style={styles.textCreateAt} theme={theme} /> */}
               </Row>
               {/* <Text medium style={styles.marginBottom('large')}>
                 {item}
               </Text> */}
             </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={true}
+              style={styles.scroll}>
+              <Image
+                source={require('src/assets/images/pDefault.png')}
+                resizeMode="stretch"
+                style={[styles.image, styles.marginBottom('small')]}
+              />
+              <Image
+                source={{uri: imageUrl[0]}}
+                resizeMode="stretch"
+                style={[styles.image, styles.marginBottom('small')]}
+              />
+              <Image
+                source={{uri: imageUrl[1]}}
+                resizeMode="stretch"
+                style={[styles.image, styles.marginBottom('small')]}
+              />
+              {/* <ChooseItem
+                key={'1'}
+                item={'1'}
+                onPress={() => {}}
+                active={true}
+                topElement={topElement}
+                containerStyle={styles.item}
+              /> */}
+              {/* 
+              <Image
+                source={require('src/assets/images/pDefault.png')}
+                resizeMode="stretch"
+                style={[styles.image, styles.marginBottom('small')]}
+              /> */}
+            </ScrollView>
             <View style={styles.marginBottom('big')}>
               <Input
                 label={'피드백을 여기에 작성해 주세요.'}
                 multiline
                 numberOfLines={8}
                 value={item.feedback}
-                onChangeText={value => this.setState({review: value})}
+                onChangeText={value => setFeedback(value)}
               />
             </View>
             <Button
               loading={false}
               title={'저장'}
               containerStyle={styles.marginBottom('big')}
-              onPress={addReview}
+              onPress={onFeedback}
             />
           </Container>
         </ScrollView>
@@ -200,7 +270,7 @@ const styles = {
     flexDirection: 'row',
     marginLeft: margin.medium,
     marginRight: margin.medium,
-    marginBottom: margin.large,
+    marginBottom: margin.small,
   },
   scroll: {
     marginTop: margin.large,

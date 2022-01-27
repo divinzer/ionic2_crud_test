@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import firestore from '@react-native-firebase/firestore';
+import {useNavigation} from '@react-navigation/native';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {sortBy, merge, includes} from 'lodash';
-import {StyleSheet, ActivityIndicator, View} from 'react-native';
+import {StyleSheet, ActivityIndicator, TouchableOpacity, View} from 'react-native';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import Empty from 'src/containers/Empty';
 import {Row, Col} from 'src/containers/Gird';
@@ -26,6 +27,7 @@ import {
   FETCH_CHECK_LIST_ERROR,
   CHANGE_CHECK_FEEDBACK,
   CHANGE_CHECK_LIST,
+  CHANGE_CHECK_LIST_SUCCESS,
   CHANGE_CHECK_LIST_ERROR,
 } from 'src/modules/firebase/constants';
 
@@ -44,8 +46,10 @@ const stateSelector = createStructuredSelector({
 import {margin, padding} from 'src/components/config/spacing';
 
 const CheckListScreen = props => {
+  const navigation = useNavigation();
   const {route} = props;
   const fId = route.params.item.id;
+  const weekItem = route.params.item;
   const dispatch = useDispatch();
   const [kitchenCheckItems, setKitchenCheckItems] = useState({
     개인위생: {},
@@ -60,17 +64,21 @@ const CheckListScreen = props => {
   const [title0, setTitle0] = useState('');
   const [title1, setTitle1] = useState('');
   const [title2, setTitle2] = useState('');
-  const [feedbackDesc, setFeedbackDesc] = useState('');
-  const [newName, setNewName] = useState('');
+  const [memo, setMemo] = useState(weekItem.kitchenMemo);
+  const [selectedData, setSelectedData] = useState({name: '', order: ''});
   const {loading, loading2, checkList} = useSelector(stateSelector);
   const [isModal, setModal] = useState('');
-  const [pending, setPending] = useState(false);
-  const kitchenRef = firestore()
+
+  const weeklyRef = firestore()
     .collection('weeklyCheck')
-    .doc(route.params.item.id)
-    .collection('kitchen');
-  const checklistRef = firestore().collection('checklistClone').doc('checkItems');
+    .doc(route.params.item.id);
+
+  const checklistRef = firestore()
+    .collection('checklistClone')
+    .doc('checkItems');
+
   const onChecked = async ck => {
+    dispatch({type: CHANGE_CHECK_LIST});
     let selected = '식재관리';
     if (includes(ck, 'hygiene')) {
       selected = '개인위생';
@@ -80,79 +88,100 @@ const CheckListScreen = props => {
       selected = '조리장위생';
     }
     const checked = !kitchenCheckItems[selected][ck];
+
     const newCheckItem = {
       ...kitchenCheckItems,
       [selected]: {...kitchenCheckItems[selected], [ck]: checked},
     };
-
     try {
-      dispatch({type: CHANGE_CHECK_LIST, payload: ck});
-      await kitchenRef.doc('checklist').set(newCheckItem);
-      await setKitchenCheckItems(newCheckItem);
+      dispatch({
+        type: CHANGE_CHECK_LIST_SUCCESS,
+        payload: {name: ck, value: checked},
+      });
+      await weeklyRef.collection('kitchen').doc('checklist').update(newCheckItem);
+      setKitchenCheckItems(newCheckItem);
+      fetchKitchenList();
     } catch (e) {
+      dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
       console.log('e', e);
     }
   };
 
-  const onModal = type => {
+  const onModal = (type, data) => {
     console.log('type: ', type);
+    console.log('data: ', data);
     // type: new, title, item
     setModal(type);
+    setSelectedData(data);
   };
 
   const fetchKitchenList = async () => {
+    dispatch({type: CHANGE_CHECK_LIST});
     try {
-      // setLoading(true);
-      await kitchenRef.get().then(documentSnapshot => {
-        const feedback = documentSnapshot.docs[1].data();
-        const obj = merge(
-          feedback['개인위생'],
-          feedback['식재관리'],
-          feedback['조리장위생'],
-        );
-        for (const item in obj) {
-          dispatch({
-            type: CHANGE_CHECK_FEEDBACK,
-            payload: {name: item, value: obj[item]},
-          });
-        }
+      await weeklyRef
+        .collection('kitchen')
+        .get()
+        .then(documentSnapshot => {
+          const feedback = documentSnapshot.docs[1].data();
+          const obj = merge(
+            feedback['개인위생'],
+            feedback['식재관리'],
+            feedback['조리장위생'],
+          );
+          for (const item in obj) {
+            dispatch({
+              type: CHANGE_CHECK_FEEDBACK,
+              payload: {name: item, value: obj[item]},
+            });
+          }
 
-        // chkeck in checked
-        setKitchenCheckItems(documentSnapshot.docs[0].data());
+          // chkeck in checked
+          // console.log('aaa', documentSnapshot.docs[0].data()['조리장위생']);
+          for (const item in documentSnapshot.docs[0].data()['개인위생']) {
+            const value = documentSnapshot.docs[0].data()['개인위생'][item];
+            // console.log('v0', item);
+            if (value === true) {
+              dispatch({
+                type: CHANGE_CHECK_LIST_SUCCESS,
+                payload: {name: item, value: value},
+              });
+            }
+            if (item === 'title') {
+              setTitle0(value);
+            }
+          }
+          // console.log('eere', documentSnapshot.docs[0].data());
+          for (const item in documentSnapshot.docs[0].data()['식재관리']) {
+            let value = documentSnapshot.docs[0].data()['식재관리'][item];
+            // console.log('v1', item);
+            if (value === true) {
+              dispatch({
+                type: CHANGE_CHECK_LIST_SUCCESS,
+                payload: {name: item, value: value},
+              });
+            }
+            if (item === 'title') {
+              setTitle1(value);
+            }
+          }
 
-        for (const item in documentSnapshot.docs[0].data()['개인위생']) {
-          const value = documentSnapshot.docs[0].data()['개인위생'][item];
-          if (value === true) {
-            dispatch({type: CHANGE_CHECK_LIST, payload: item});
+          for (const item in documentSnapshot.docs[0].data()['조리장위생']) {
+            let value = documentSnapshot.docs[0].data()['조리장위생'][item];
+            // console.log('v2', item);
+            if (value === true) {
+              dispatch({
+                type: CHANGE_CHECK_LIST_SUCCESS,
+                payload: {name: item, value: value},
+              });
+            }
+            if (item === 'title') {
+              setTitle2(value);
+            }
           }
-          if (item === 'title') {
-            setTitle0(value);
-          }
-        }
-
-        for (const item in documentSnapshot.docs[0].data()['식재관리']) {
-          let value = documentSnapshot.docs[0].data()['식재관리'][item];
-          if (value === true) {
-            dispatch({type: CHANGE_CHECK_LIST, payload: item});
-          }
-          if (item === 'title') {
-            setTitle1(value);
-          }
-        }
-
-        for (const item in documentSnapshot.docs[0].data()['조리장위생']) {
-          let value = documentSnapshot.docs[0].data()['조리장위생'][item];
-          if (value === true) {
-            dispatch({type: CHANGE_CHECK_LIST, payload: item});
-          }
-          if (item === 'title') {
-            setTitle2(value);
-          }
-        }
-
-        return documentSnapshot;
-      });
+          setKitchenCheckItems(documentSnapshot.docs[0].data());
+        });
     } catch (e) {
+      console.log('e: ', e);
       dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
     }
   };
@@ -236,35 +265,63 @@ const CheckListScreen = props => {
     }
   };
 
-  const modifyData = async (item, value) => {
-    dispatch({type: FETCH_CHECK_LIST});
+  const addMemo = async () => {
+    try {
+      await weeklyRef.update({
+        ...weekItem,
+        kitchenMemo: memo,
+      });
+      fetchKitchenList();
+    } catch (e) {
+      console.log('e', e);
+    }
+  };
+
+  const modifyData = async () => {
     // setPending(true);
     let selected = '식재관리';
-    if (includes(item.checkName, 'hygiene')) {
+    if (includes(selectedData.order, 'hygiene')) {
       selected = '개인위생';
-    } else if (includes(item.checkName, 'ingredient')) {
+    } else if (includes(selectedData.order, 'ingredient')) {
       selected = '식재관리';
-    } else if (includes(item.checkName, 'kitchen')) {
+    } else if (includes(selectedData.order, 'kitchen')) {
       selected = '조리장위생';
     }
 
     try {
-      // dispatch({type: CHANGE_CHECK_LIST, payload: item.checkName});
-      await checklistRef.update({
-        [selected]: {
-          ...checkItems[selected],
-          [item.checkName]: value,
-        },
-      });
+      isModal === 'title' &&
+        (await weeklyRef
+          .collection('kitchen')
+          .doc('checklist')
+          .update({
+            [selectedData.order]: {
+              ...kitchenCheckItems[selectedData.order],
+              title: selectedData.name,
+            },
+          }));
+      isModal === 'edit' &&
+        (await checklistRef.update({
+          [selected]: {
+            ...checkItems[selected],
+            [selectedData.order]: selectedData.name,
+          },
+        }));
+      isModal === 'new' &&
+        (await checklistRef.update({
+          [selected]: {
+            ...checkItems[selected],
+            [selectedData.order]: selectedData.name,
+          },
+        }));
       fetchCheckList();
+      fetchKitchenList();
+      setModal('');
     } catch (e) {
-      dispatch({type: FETCH_CHECK_LIST_ERROR});
       console.log('e', e);
     }
   };
 
   const deleteData = async item => {
-    dispatch({type: FETCH_CHECK_LIST});
     // setPending(true);
     let selected = '식재관리';
     if (includes(item.checkName, 'hygiene')) {
@@ -276,7 +333,6 @@ const CheckListScreen = props => {
     }
 
     try {
-      // dispatch({type: CHANGE_CHECK_LIST, payload: item.checkName});
       await checklistRef.update({
         [selected]: {
           ...checkItems[selected],
@@ -285,100 +341,132 @@ const CheckListScreen = props => {
       });
       fetchCheckList();
     } catch (e) {
-      dispatch({type: FETCH_CHECK_LIST_ERROR});
       console.log('e', e);
     }
   };
 
   useEffect(() => {
     fetchCheckList();
-    fetchKitchenList();
+    setTimeout(() => {
+      fetchKitchenList();
+    }, 100);
+    const willFocusSubscription = navigation.addListener('focus', () => {
+      fetchKitchenList();
+    });
+    return willFocusSubscription;
   }, [dispatch]);
 
-  const itemList = (item, index) => {
-    // console.log('checkList: ', checkList);
+  // useEffect(() => {
+
+  // }, [checkList]);
+
+  const itemList = item => {
     if (item.checkName === 'hygiene-1') {
       return (
-        <>
+        <TouchableOpacity
+          activeOpacity={1}
+          onLongPress={() =>
+            onModal('title', {
+              name: title0 || '키친-개인위생',
+              order: '개인위생',
+            })
+          }>
           <Row style={styles.row}>
             <Col>
-              <InputBasic
-                style={styles.inputName}
-                value={title0 || '키친-개인위생'}
-                onChangeText={value => setTitle0(value)}
-              />
+              <Text style={styles.inputName}>{title0 || '키친-개인위생'}</Text>
             </Col>
             <Icon
               size={22}
               type="font-awesome"
               name={'plus-circle'}
               color={grey4}
-              onPress={() => onModal('new')}
+              onPress={() =>
+                onModal('new', {
+                  name: '',
+                  order: 'hygiene' + Object.keys(checkItems['개인위생']).length,
+                })
+              }
               underlayColor={'transparent'}
               containerStyle={{paddingRight: 10, paddingTop: 10}}
               // style={{paddingRight: 100}}
             />
           </Row>
-        </>
+        </TouchableOpacity>
       );
     } else if (item.checkName === 'ingredient-1') {
       return (
-        <>
+        <TouchableOpacity
+          activeOpacity={1}
+          onLongPress={() =>
+            onModal('title', {
+              name: title1 || '키친-식재관리',
+              order: '식재관리',
+            })
+          }>
           <Row style={styles.row}>
             <Col>
-              <InputBasic
-                style={styles.inputName}
-                value={title1 || '키친-식재관리'}
-                onChangeText={value => setTitle1(value)}
-              />
+              <Text style={styles.inputName}>{title1 || '키친-식재관리'}</Text>
             </Col>
             <Icon
               size={22}
               type="font-awesome"
               name={'plus-circle'}
               color={grey4}
-              onPress={() => onModal('edit')}
+              onPress={() =>
+                onModal('new', {
+                  name: '',
+                  order: 'ingredient' + Object.keys(checkItems['식재관리']).length,
+                })
+              }
               underlayColor={'transparent'}
               containerStyle={{paddingRight: 10, paddingTop: 10}}
               // style={{paddingRight: 100}}
             />
           </Row>
-        </>
+        </TouchableOpacity>
       );
     } else if (item.checkName === 'kitchen-1') {
       return (
-        <>
+        <TouchableOpacity
+          activeOpacity={1}
+          onLongPress={() =>
+            onModal('title', {
+              name: title2 || '키친-조리장위생',
+              order: '조리장위생',
+            })
+          }>
           <Row style={styles.row}>
             <Col>
-              <InputBasic
-                style={styles.inputName}
-                value={title2 || '키친-조리장위생'}
-                onChangeText={value => setTitle2(value)}
-              />
+              <Text style={styles.inputName}>{title2 || '키친-조리장위생'}</Text>
             </Col>
             <Icon
               size={22}
               type="font-awesome"
               name={'plus-circle'}
               color={grey4}
-              onPress={() => onModal('title')}
+              onPress={() =>
+                onModal('new', {
+                  name: '',
+                  order: 'kitchen' + Object.keys(checkItems['조리장위생']).length,
+                })
+              }
               underlayColor={'transparent'}
               containerStyle={{paddingRight: 10, paddingTop: 10}}
               // style={{paddingRight: 100}}
             />
           </Row>
-        </>
+        </TouchableOpacity>
       );
     } else {
       return (
         <CheckListItem
-          key={index}
           item={item}
           fId={fId}
           style={{height: 30}}
           onChecked={() => onChecked(item.checkName)}
           onEdit={modifyData}
           onModal={onModal}
+          kitchenCheckItems={kitchenCheckItems}
         />
       );
     }
@@ -391,22 +479,22 @@ const CheckListScreen = props => {
           label={'피드백을 여기에 작성해 주세요.'}
           multiline
           numberOfLines={3}
-          value={feedbackDesc}
-          onChangeText={value => setFeedbackDesc(value)}
+          value={memo}
+          onChangeText={value => setMemo(value)}
         />
       </View>
       <Button
         loading={false}
-        title={'저장'}
+        title={'피드백 저장'}
         containerStyle={styles.marginBottom('big')}
-        onPress={()=>{}}
+        onPress={addMemo}
       />
     </Container>
   );
 
   const renderData = data => (
     <SwipeListView
-      // useFlatList
+      useFlatList
       keyExtractor={item => item.checkName}
       data={data}
       // refreshControl={
@@ -433,16 +521,16 @@ const CheckListScreen = props => {
         leftComponent={<IconHeader />}
         centerComponent={<TextHeader title={route.params.item.weekName} />}
         // centerComponent={<TextHeader title={route.params.weekName} />}
-        rightComponent={<SaveIcon />}
+        // rightComponent={<SaveIcon />}
       />
-      {/* {loading || loading2 ? (
+      {loading || loading2 ? (
         <View style={styles.viewLoading}>
           <ActivityIndicator size="small" />
         </View>
       ) : (
         renderData(checkList)
-      )} */}
-      {renderData(checkList)}
+      )}
+      {/* {renderData(checkList)} */}
       {footer}
       <Modal
         visible={isModal === 'new' || isModal === 'title' || isModal === 'edit'}
@@ -462,17 +550,28 @@ const CheckListScreen = props => {
           <View style={styles.marginBottom('small')}>
             <Input
               label={'아이템 내용을 기입해주세요.'}
-              value={newName}
-              onChangeText={value => setNewName(value)}
+              value={selectedData.name}
+              onChangeText={value =>
+                setSelectedData({
+                  ...selectedData,
+                  name: value,
+                })
+              }
             />
           </View>
           <Button
             loading={false}
-            title={'추가'}
-            containerStyle={styles.marginBottom('big')}
-            onPress={()=>{}
-            // editItem()
+            title={
+              isModal === 'new'
+                ? '추가'
+                : isModal === 'title'
+                ? '수정'
+                : isModal === 'edit'
+                ? '수정'
+                : ''
             }
+            containerStyle={styles.marginBottom('big')}
+            onPress={modifyData}
           />
         </Container>
       </Modal>
@@ -498,12 +597,8 @@ const styles = StyleSheet.create({
   itemLast: {
     marginRight: margin.large,
   },
-  textName: {
-    lineHeight: 40,
-  },
   inputName: {
-    lineHeight: 26,
-    // height: 10,
+    lineHeight: 40,
   },
   row: {
     flexDirection: 'row',

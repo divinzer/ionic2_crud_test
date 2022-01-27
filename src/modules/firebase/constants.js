@@ -18,6 +18,7 @@ export const FETCH_CHECK_SUCCESS = 'firebase/FETCH_CHECK_SUCCESS';
 export const FETCH_CHECK_ERROR = 'firebase/FETCH_CHECK_ERROR';
 export const CHANGE_CHECK_FEEDBACK = 'firebase/CHANGE_CHECK_FEEDBACK';
 export const CHANGE_CHECK_LIST = 'firebase/CHANGE_CHECK_LIST';
+export const CHANGE_CHECK_LIST_SUCCESS = 'firebase/CHANGE_CHECK_LIST_SUCCESS';
 export const CHANGE_CHECK_LIST_ERROR = 'firebase/CHANGE_CHECK_LIST_ERROR';
 
 export const FETCH_WEEKLY_CHECK = 'firebase/FETCH_WEEKLY_CHECK';

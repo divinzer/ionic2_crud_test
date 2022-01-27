@@ -122,8 +122,6 @@ const WishListScreen = () => {
             });
           });
           dispatch({type: FETCH_WEEKLY_CHECK_SUCCESS, payload: arr});
-        } else {
-          dispatch({type: FETCH_WEEKLY_CHECK_ERROR, payload: ''});
         }
       });
     } catch (e) {
@@ -170,6 +168,12 @@ const WishListScreen = () => {
         setWeekTitle('');
         setSelectedDoc({});
         fetchData();
+      } else {
+        await refDB.doc(selectedDoc.id).update({...doc, weekName: weekTitle});
+        setModal(false);
+        setWeekTitle('');
+        setSelectedDoc({});
+        fetchData();
       }
     } catch (e) {
       handleError({
@@ -203,9 +207,12 @@ const WishListScreen = () => {
     return subscriber; // unsubscribe on unmount
   }, []);
 
-  // useEffect(() => {
-  //   fetchData();
-  // }, [checkList, weeklyCheck]);
+  useEffect(() => {
+    const willFocusSubscription = navigation.addListener('focus', () => {
+      fetchData();
+    });
+    return willFocusSubscription;
+  }, [weeklyCheck]);
 
   const onModal = (title, name, doc = 0) => {
     setModalTitle(title);

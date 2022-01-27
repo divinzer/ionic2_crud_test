@@ -12,11 +12,13 @@ import {mainStack} from 'src/config/navigator';
 
 const CheckListItem = React.memo(props => {
   const navigation = useNavigation();
-  const {item, onChecked, fId, onModal} = props;
+  const {item, onChecked, fId, onModal, kitchenCheckItems} = props;
+  // console.log('item: ', item);
   const goFeedback = () =>
     navigation.navigate(mainStack.feedback, {
       item,
       fId,
+      kitchenCheckItems,
     });
 
   return (
@@ -32,10 +34,17 @@ const CheckListItem = React.memo(props => {
           ]}>
           <TouchableOpacity
             onPress={goFeedback}
-            onLongPress={() => onModal('edit')}>
+            onLongPress={() =>
+              onModal('edit', {
+                name: item.value,
+                order: item.checkName,
+              })
+            }>
             <Row style={styles.row}>
               <Col style={styles.center}>
-                <Text style={item.checked ? {color: red} : {color: black}} medium>
+                <Text
+                  style={item.checked ? {color: red} : {color: black}}
+                  medium>
                   {item.value}
                 </Text>
               </Col>
