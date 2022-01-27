@@ -117,6 +117,7 @@ const FeedbackScreen = props => {
       };
 
       await weeklyRef.collection('kitchen').doc('feedback').update(newFeedback);
+      await weeklyRef.update({hasFeedback: true});
     } catch (e) {
       dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
       console.log('e', e);

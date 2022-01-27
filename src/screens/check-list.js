@@ -122,63 +122,68 @@ const CheckListScreen = props => {
         .collection('kitchen')
         .get()
         .then(documentSnapshot => {
-          const feedback = documentSnapshot.docs[1].data();
-          const obj = merge(
-            feedback['개인위생'],
-            feedback['식재관리'],
-            feedback['조리장위생'],
-          );
-          for (const item in obj) {
-            dispatch({
-              type: CHANGE_CHECK_FEEDBACK,
-              payload: {name: item, value: obj[item]},
-            });
-          }
+          if (documentSnapshot) {
+            const feedback = documentSnapshot.docs[1].data();
+            // console.log('feedback: ', feedback);
+            const obj = merge(
+              feedback['개인위생'],
+              feedback['식재관리'],
+              feedback['조리장위생'],
+            );
+            for (const item in obj) {
+              if (obj[item]) {
+                dispatch({
+                  type: CHANGE_CHECK_FEEDBACK,
+                  payload: {name: item, value: obj[item]},
+                });
+              }
+            }
 
-          // chkeck in checked
-          // console.log('aaa', documentSnapshot.docs[0].data()['조리장위생']);
-          for (const item in documentSnapshot.docs[0].data()['개인위생']) {
-            const value = documentSnapshot.docs[0].data()['개인위생'][item];
-            // console.log('v0', item);
-            if (value === true) {
-              dispatch({
-                type: CHANGE_CHECK_LIST_SUCCESS,
-                payload: {name: item, value: value},
-              });
+            // chkeck in checked
+            // console.log('aaa', documentSnapshot.docs[0].data()['조리장위생']);
+            for (const item in documentSnapshot.docs[0].data()['개인위생']) {
+              const value = documentSnapshot.docs[0].data()['개인위생'][item];
+              // console.log('v0', item);
+              if (value === true) {
+                dispatch({
+                  type: CHANGE_CHECK_LIST_SUCCESS,
+                  payload: {name: item, value: value},
+                });
+              }
+              if (item === 'title') {
+                setTitle0(value);
+              }
             }
-            if (item === 'title') {
-              setTitle0(value);
+            // console.log('eere', documentSnapshot.docs[0].data());
+            for (const item in documentSnapshot.docs[0].data()['식재관리']) {
+              let value = documentSnapshot.docs[0].data()['식재관리'][item];
+              // console.log('v1', item);
+              if (value === true) {
+                dispatch({
+                  type: CHANGE_CHECK_LIST_SUCCESS,
+                  payload: {name: item, value: value},
+                });
+              }
+              if (item === 'title') {
+                setTitle1(value);
+              }
             }
-          }
-          // console.log('eere', documentSnapshot.docs[0].data());
-          for (const item in documentSnapshot.docs[0].data()['식재관리']) {
-            let value = documentSnapshot.docs[0].data()['식재관리'][item];
-            // console.log('v1', item);
-            if (value === true) {
-              dispatch({
-                type: CHANGE_CHECK_LIST_SUCCESS,
-                payload: {name: item, value: value},
-              });
-            }
-            if (item === 'title') {
-              setTitle1(value);
-            }
-          }
 
-          for (const item in documentSnapshot.docs[0].data()['조리장위생']) {
-            let value = documentSnapshot.docs[0].data()['조리장위생'][item];
-            // console.log('v2', item);
-            if (value === true) {
-              dispatch({
-                type: CHANGE_CHECK_LIST_SUCCESS,
-                payload: {name: item, value: value},
-              });
+            for (const item in documentSnapshot.docs[0].data()['조리장위생']) {
+              let value = documentSnapshot.docs[0].data()['조리장위생'][item];
+              // console.log('v2', item);
+              if (value === true) {
+                dispatch({
+                  type: CHANGE_CHECK_LIST_SUCCESS,
+                  payload: {name: item, value: value},
+                });
+              }
+              if (item === 'title') {
+                setTitle2(value);
+              }
             }
-            if (item === 'title') {
-              setTitle2(value);
-            }
+            setKitchenCheckItems(documentSnapshot.docs[0].data());
           }
-          setKitchenCheckItems(documentSnapshot.docs[0].data());
         });
     } catch (e) {
       console.log('e: ', e);
@@ -194,7 +199,7 @@ const CheckListScreen = props => {
     dispatch({type: FETCH_CHECK_LIST});
     try {
       await checklistRef.get().then(documentSnapshot => {
-        if (documentSnapshot !== null) {
+        if (documentSnapshot) {
           setCheckItems(documentSnapshot.data());
           for (const item in documentSnapshot.data()['개인위생']) {
             let value = documentSnapshot.data()['개인위생'][item];

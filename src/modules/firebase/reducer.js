@@ -3,7 +3,6 @@ import produce from 'immer';
 import {REHYDRATE} from 'redux-persist/lib/constants';
 import * as Actions from './constants';
 import {notificationMessage} from 'src/utils/error';
-import { includes } from 'lodash';
 
 const initError = '';
 
@@ -55,6 +54,7 @@ const firebaseReducer = produce((draft, action) => {
       break;
     case Actions.FETCH_CHECK_LIST_SUCCESS:
       draft.checkList = payload;
+      draft.checkList = payload;
       draft.loading = false;
       break;
     case Actions.FETCH_CHECK_LIST_ERROR:
@@ -74,9 +74,15 @@ const firebaseReducer = produce((draft, action) => {
       draft.error = notificationMessage(payload);
       break;
     case Actions.CHANGE_CHECK_FEEDBACK:
-      const {name, value} = payload;
-      const feedback = draft.checkList.find(list => list.checkName === name);
-      feedback.feedback = value;
+      if (draft.checkList.length > 0) {
+        const item = draft.checkList.find(
+          list => list.checkName === payload.name,
+        );
+        if (item) {
+          // console.log('item', JSON.stringify(item));
+          item.feedback = payload.value;
+        }
+      }
       break;
     case Actions.CHANGE_CHECK_LIST:
       draft.loading = false;
@@ -85,11 +91,9 @@ const firebaseReducer = produce((draft, action) => {
       draft.loading = false;
       // console.log('aa', payload.name);
       if (draft.checkList.length > 0) {
-        const item = draft.checkList.find(list => {
-          if (!includes(list.checkName, '-1')) {
-            return list.checkName === payload.name;
-          }
-        });
+        const item = draft.checkList.find(
+          list => list.checkName === payload.name,
+        );
 
         if (item) {
           // console.log('item', JSON.stringify(item));
