@@ -354,7 +354,7 @@ const CheckListScreen = props => {
     fetchCheckList();
     setTimeout(() => {
       fetchKitchenList();
-    }, 100);
+    }, 0);
     const willFocusSubscription = navigation.addListener('focus', () => {
       fetchKitchenList();
     });

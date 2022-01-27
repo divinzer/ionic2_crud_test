@@ -236,7 +236,7 @@ const FeedbackScreen = props => {
                 label={'피드백을 여기에 작성해 주세요.'}
                 multiline
                 numberOfLines={8}
-                value={item.feedback}
+                value={feedback}
                 onChangeText={value => setFeedback(value)}
               />
             </View>
