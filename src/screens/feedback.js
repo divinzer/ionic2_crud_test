@@ -38,6 +38,7 @@ const stateSelector = createStructuredSelector({
 
 const FeedbackScreen = props => {
   const {item, fId, kitchenCheckItems} = props.route.params || '';
+  console.log('fId: ', fId)
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const {loading, checkList} = useSelector(stateSelector);
@@ -46,6 +47,18 @@ const FeedbackScreen = props => {
   const [imageUrl, setImageUrl] = useState([]);
 
   const weeklyRef = firestore().collection('weeklyCheck').doc(fId);
+  // const stoageRef = storage().collection('feedbackImage').get();
+  // 8XjzdZaOwb6kuSKF9bwx
+  const stoageRef = storage().ref('feedbackImage').list({fId}).then(
+    result => {
+      // result.items.forEach(ref => {
+      //   console.log(ref.fullPath);
+      // })
+      console.log('r', result);
+      console.log('ttt', result.nextPageToken);
+    }
+  );
+  // console.log('ss', stoageRef);
 
   let defaultImage = '';
   const onChecked = async () => {
