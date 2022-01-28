@@ -1,7 +1,6 @@
 import React from 'react';
 import {compose} from 'redux';
 import {connect} from 'react-redux';
-import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import unescape from 'lodash/unescape';
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
@@ -19,10 +18,9 @@ import {white, black, orange, grey4} from 'src/components/config/colors';
 // const stockStatusList = ['instock', 'onbackorder'];
 
 const ItemWishlist = React.memo(props => {
-  const {t} = useTranslation();
   const navigation = useNavigation();
   const {item, style, configs, loading, onModal} = props;
-  const {weekName, type, isDeleted, hasFeedback, id, kitchenMomo, writeenAt} = item;
+  const {weekName, type, isDeleted, hasFeedback, id, kitchenMemo, writeenAt} = item;
   const goCheckList = () =>
     navigation.navigate(mainStack.check_list, {
       item,

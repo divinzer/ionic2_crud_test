@@ -79,7 +79,7 @@ const firebaseReducer = produce((draft, action) => {
           list => list.checkName === payload.name,
         );
         if (item) {
-          // console.log('item', JSON.stringify(item));
+          console.log('feedback', JSON.stringify(item));
           item.feedback = payload.value;
         }
       }

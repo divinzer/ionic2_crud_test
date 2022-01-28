@@ -13,7 +13,7 @@ import {mainStack} from 'src/config/navigator';
 const CheckListItem = React.memo(props => {
   const navigation = useNavigation();
   const {item, onChecked, fId, onModal, kitchenCheckItems} = props;
-  // console.log('item: ', item);
+  console.log('item: ', item.feedback);
   const goFeedback = () =>
     navigation.navigate(mainStack.feedback, {
       item,
@@ -43,7 +43,7 @@ const CheckListItem = React.memo(props => {
             <Row style={styles.row}>
               <Col style={styles.center}>
                 <Text
-                  style={item.checked ? {color: red} : {color: black}}
+                  style={item.feedback ? {color: red} : {color: black}} // check 하자
                   medium>
                   {item.value}
                 </Text>

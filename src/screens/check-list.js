@@ -18,13 +18,13 @@ import ButtonLeftSwiper from 'src/containers/ButtonLeftSwiper';
 import CheckListItem from './check-list-item';
 import {TextHeader, SaveIcon, IconHeader} from 'src/containers/HeaderComponent';
 import {grey4, grey6, blue} from 'src/components/config/colors';
-import {handleError} from 'src/utils/error';
+import {handleError, showSuccess} from 'src/utils/error';
 
 import {
   FETCH_CHECK_LIST,
   FETCH_CHECK_LIST_SUCCESS,
   FETCH_CHECK_LIST_ERROR,
-  // CHANGE_CHECK_FEEDBACK,
+  CHANGE_CHECK_FEEDBACK,
   CHANGE_CHECK_LIST,
   CHANGE_CHECK_LIST_SUCCESS,
   CHANGE_CHECK_LIST_ERROR,
@@ -48,7 +48,7 @@ const CheckListScreen = props => {
   const navigation = useNavigation();
   const {route} = props;
   const fId = route.params.item.id;
-  console.log('fId: ', fId);
+  // console.log('fId: ', fId);
   const weekItem = route.params.item;
   const dispatch = useDispatch();
   const [kitchenCheckItems, setKitchenCheckItems] = useState({
@@ -125,24 +125,22 @@ const CheckListScreen = props => {
         .collection('kitchen')
         .get()
         .then(documentSnapshot => {
-
           // check feedback
           if (documentSnapshot) {
             const feedback = documentSnapshot.docs[1].data();
-          //   // console.log('feedback: ', feedback);
-          //   const obj = merge(
-          //     feedback['개인위생'],
-          //     feedback['식재관리'],
-          //     feedback['조리장위생'],
-          //   );
-          //   for (const item in obj) {
-          //     if (obj[item]) {
-          //       dispatch({
-          //         type: CHANGE_CHECK_FEEDBACK,
-          //         payload: {name: item, value: obj[item]},
-          //       });
-          //     }
-          //   }
+            const obj = merge(
+              feedback['개인위생'],
+              feedback['식재관리'],
+              feedback['조리장위생'],
+            );
+            for (const item in obj) {
+              if (obj[item]) {
+                dispatch({
+                  type: CHANGE_CHECK_FEEDBACK,
+                  payload: {name: item, value: obj[item]},
+                });
+              }
+            }
 
             // chkeck in checked
             // console.log('aaa', documentSnapshot.docs[0].data()['조리장위생']);
@@ -225,6 +223,8 @@ const CheckListScreen = props => {
             value: '개인위생',
             checked: false,
             feedback: null,
+            disableRightSwipe: true,
+            disableLeftSwipe: true,
           });
           for (const item in documentSnapshot.data()['식재관리']) {
             let value = documentSnapshot.data()['식재관리'][item];
@@ -245,6 +245,8 @@ const CheckListScreen = props => {
             value: '',
             checked: false,
             feedback: null,
+            disableRightSwipe: true,
+            disableLeftSwipe: true,
           });
           for (const item in documentSnapshot.data()['조리장위생']) {
             let value = documentSnapshot.data()['조리장위생'][item];
@@ -265,6 +267,8 @@ const CheckListScreen = props => {
             value: '',
             checked: false,
             feedback: null,
+            disableRightSwipe: true,
+            disableLeftSwipe: true,
           });
           total = arr0.concat(arr1, arr2);
           dispatch({type: FETCH_CHECK_LIST_SUCCESS, payload: total});
@@ -282,7 +286,18 @@ const CheckListScreen = props => {
         kitchenMemo: memo,
       });
       fetchKitchenList();
+      showSuccess({
+        message: '피드백이 저장되었습니다.',
+      });
+      if (memo) {
+        await weeklyRef.update({hasFeedback: true});
+      } else {
+        await weeklyRef.update({hasFeedback: false});
+      }
     } catch (e) {
+      handleError({
+        message: '피드백이 저장되지 못했습니다. 관리자에게 문의하세요',
+      });
       console.log('e', e);
     }
   };
@@ -486,7 +501,7 @@ const CheckListScreen = props => {
     <Container style={styles.container}>
       <View>
         <Input
-          label={'피드백을 여기에 작성해 주세요.'}
+          label={'피드백'}
           multiline
           numberOfLines={3}
           value={memo}

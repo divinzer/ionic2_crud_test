@@ -3,10 +3,9 @@ import {utils} from '@react-native-firebase/app';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {useNavigation} from '@react-navigation/native';
-// import {createStructuredSelector} from 'reselect';
+import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
-import {View, ScrollView, Image, KeyboardAvoidingView, TouchableOpacity, ActivityIndicator} from 'react-native';
-import {launchImageLibrary} from 'react-native-image-picker';
+import {View, ScrollView, Image, KeyboardAvoidingView} from 'react-native';
 import {sortBy, merge, includes} from 'lodash';
 import {Header, Text, ThemedView} from 'src/components';
 import {Row, Col} from 'src/containers/Gird';
@@ -17,7 +16,6 @@ import Container from 'src/containers/Container';
 import ChooseItem from 'src/containers/ChooseItem';
 import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
 import {grey4, grey6} from 'src/components/config/colors';
-import {handleError, showSuccess} from 'src/utils/error';
 
 import {
   CHANGE_CHECK_LIST,
@@ -26,46 +24,42 @@ import {
   CHANGE_CHECK_FEEDBACK,
 } from 'src/modules/firebase/constants';
 
+import {
+  loadingCheckListSelector,
+  checkListSelector,
+} from 'src/modules/firebase/selectors';
+
 import {margin} from 'src/components/config/spacing';
+
+const stateSelector = createStructuredSelector({
+  loading: loadingCheckListSelector(),
+  checkList: checkListSelector(),
+});
 
 const FeedbackScreen = props => {
   const {item, fId, kitchenCheckItems} = props.route.params || '';
-  console.log('item: ', item.checkName);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const {loading, checkList} = useSelector(stateSelector);
   const [checked, setChecked] = useState(item.checked);
   const [feedback, setFeedback] = useState(item.feedback);
-  const [imagesUrl, setImagesUrl] = useState([]);
-  const [selectedM, selectMethod] = useState('');
-  const [uploading, setUploading] = useState(false);
-  const [uploadTaskSnapshot, setUploadTaskSnapshot] = useState({});
+  const [imageUrl, setImageUrl] = useState([]);
+
   const weeklyRef = firestore().collection('weeklyCheck').doc(fId);
-  const stoageRef = storage().ref(
-    `feedbackImage/${fId}/kitchen/${item.checkName}`,
-  );
-
-  // for Image Selectore
-  const onMediaSelect = async media => {
-    if (!media.didCancel) {
-      // Upload Process
-      setUploading(true);
-      const reference = await storage().ref(
-        `feedbackImage/${fId}/kitchen/${item.checkName}/${media.assets[0].fileName}`,
-      );
-      const task = reference.putFile(media.assets[0].uri);
-      task.on('state_changed', (taskSnapshot) => {
-        setUploadTaskSnapshot(taskSnapshot);
-      });
-      task.then(() => {
-        fetchImages();
-        setUploading(false);
-      });
+  // const stoageRef = storage().collection('feedbackImage').get();
+  // 8XjzdZaOwb6kuSKF9bwx
+  const stoageRef = storage().ref('feedbackImage').list({fId}).then(
+    result => {
+      // result.items.forEach(ref => {
+      //   console.log(ref.fullPath);
+      // })
+      console.log('r', result);
+      console.log('ttt', result.nextPageToken);
     }
-  };
+  );
+  // console.log('ss', stoageRef);
 
-  const onSelectImagePress = () =>
-    launchImageLibrary({ mediaType: 'image' }, onMediaSelect);
-
+  let defaultImage = '';
   const onChecked = async () => {
     dispatch({type: CHANGE_CHECK_LIST});
     let selected = '식재관리';
@@ -76,6 +70,7 @@ const FeedbackScreen = props => {
     } else if (includes(item.checkName, 'kitchen')) {
       selected = '조리장위생';
     }
+    // const checked = !kitchenCheckItems[selected][ck];
 
     const newCheckItem = {
       ...kitchenCheckItems,
@@ -134,72 +129,65 @@ const FeedbackScreen = props => {
       };
 
       await weeklyRef.collection('kitchen').doc('feedback').update(newFeedback);
-      showSuccess({
-        message: '피드백이 저장되었습니다.',
-      });
+      await weeklyRef.update({hasFeedback: true});
     } catch (e) {
-      handleError({
-        message: '피드백이 저장되지 못했습니다. 관리자에게 문의하세요',
-      });
       dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
       console.log('e', e);
     }
   };
 
-  const fetchImages = async () => {
-    let i = 0;
-    setImagesUrl([]);
-    await stoageRef.list().then(result => {
-      if (result.items.length > 0) {
-        result.items.forEach(ref => {
-          storage()
-            .ref(ref.fullPath)
-            .getDownloadURL()
-            .then(url => {
-              setImagesUrl(imagesUrl => [
-                ...imagesUrl,
-                {id: i.toString(), url: url},
-              ]);
-              i++;
-            });
-        });
-      }
-      // return Promise.resolve();
-    });
+  const fetchImage = async () => {
+    const {checkName} = item;
+    // const media = '/feedbackImage/50297A9880424B81982/kitchen/ingredient7.jpg';
+    const media = '/feedbackImage/50297A98-8042-4B81-9828-E59F7E3E18CD/kitchen/unnamed.jpg';
+    const media2 = '/feedbackImage/50297A98-8042-4B81-9828-E59F7E3E18CD/kitchen/ingredient7.jpg';
+    const mediaUri = '/feedbackImage/50297A9880424B81982/kitchen/';
+    const ref = await storage().ref(media);
+    const ref2 = await storage().ref(media2);
+    const defaultImage = await ref.getDownloadURL();
+    const defaultImage2 = await ref2.getDownloadURL();
+    const arr = [defaultImage, defaultImage2];
+    setImageUrl(arr);
+    // const task = ref.putFile(media);
+
+    // task.then(async () => {
+    //   defaultImage = await ref.getDownloadURL();
+    // });
+    // const pathToFile = `${utils.FilePath.PICTURES_DIRECTORY/sda.jpg}`;
+    // // 50297A98-8042-4B81-982
+    // console.log('p', pathToFile);
+    // try {
+    //   const ref = firestore()
+    //     .collection('weeklyCheck')
+    //     .doc(route.params.item.id)
+    //     .collection('feedback');
+    //   await ref.get().then(documentSnapshot => {
+    //     // chkeck in checked
+    //     for (const item in documentSnapshot.docs[0].data()['개인위생']) {
+    //       let value = documentSnapshot.docs[0].data()['개인위생'][item];
+    //       console.log('value', value);
+    //       // if (value === true) {
+    //       //   dispatch({type: CHANGE_CHECK_LIST, payload: item});
+    //       // }
+    //     }
+    //     return documentSnapshot;
+    //   });
+    // } catch (e) {
+    //   // dispatch({type: FETCH_CHECK_ERROR, payload: e});
+    // }
   };
 
   useEffect(() => {
-    fetchImages();
+    fetchImage();
   }, [])
 
-  const renderItem = img => {
-    const topElement = (
-      <Image
-        source={{uri: img.url}}
-        style={styles.image}
-        resizeMode="stretch"
-      />
-    );
-    // const bottomElement = <Text medium>{item.title}</Text>;
-    return (
-      <ChooseItem
-        key={img.id}
-        item={img}
-        onPress={() => selectMethod(img.id)}
-        active={selectedM && img.id && img.id === selectedM}
-        topElement={topElement}
-        // bottomElement={bottomElement}
-        containerStyle={styles.item}
-      />
-    );
-  };
-  // const topElement = (
-  //   <Image
-  //     source={require('src/assets/images/pDefault.png')}
-  //     style={styles.imageItem}
-  //     resizeMode="stretch"
-  //   />
-  // );
+  const topElement = (
+    <Image
+      source={{uri: imageUrl[0]}}
+      style={[styles.image, styles.marginBottom('small')]}
+      resizeMode="stretch"
+    />
+  );
 
   return (
     <ThemedView isFullView>
@@ -218,36 +206,46 @@ const FeedbackScreen = props => {
                 </Col>
               </Row>
               {/* <Text medium style={styles.marginBottom('large')}>
-                {imagesUrl[0]}
+                {item}
               </Text> */}
             </View>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={true}
               style={styles.scroll}>
-              <TouchableOpacity onPress={onSelectImagePress}>
-                <Image
-                  source={require('src/assets/images/plus2.png')}
-                  resizeMode="stretch"
-                  style={[styles.image, {marginVertical: margin.base}]}
-                />
-              </TouchableOpacity>
-              {uploading ? (
-                <View style={styles.viewLoading}>
-                  <ActivityIndicator size="small" />
-                  <Text style={styles.progress}>{`${(
-                    (uploadTaskSnapshot.bytesTransferred /
-                      uploadTaskSnapshot.totalBytes) *
-                    100
-                  ).toFixed(2)}% / 100%`}</Text>
-                </View>
-              ) : (
-                imagesUrl.length > 0 && imagesUrl.map(img => renderItem(img))
-              )}
+              <Image
+                source={require('src/assets/images/pDefault.png')}
+                resizeMode="stretch"
+                style={[styles.image, styles.marginBottom('small')]}
+              />
+              <Image
+                source={{uri: imageUrl[0]}}
+                resizeMode="stretch"
+                style={[styles.image, styles.marginBottom('small')]}
+              />
+              <Image
+                source={{uri: imageUrl[1]}}
+                resizeMode="stretch"
+                style={[styles.image, styles.marginBottom('small')]}
+              />
+              {/* <ChooseItem
+                key={'1'}
+                item={'1'}
+                onPress={() => {}}
+                active={true}
+                topElement={topElement}
+                containerStyle={styles.item}
+              /> */}
+              {/* 
+              <Image
+                source={require('src/assets/images/pDefault.png')}
+                resizeMode="stretch"
+                style={[styles.image, styles.marginBottom('small')]}
+              /> */}
             </ScrollView>
             <View style={styles.marginBottom('big')}>
               <Input
-                label={'피드백'}
+                label={'피드백을 여기에 작성해 주세요.'}
                 multiline
                 numberOfLines={8}
                 value={feedback}
@@ -301,8 +299,8 @@ const styles = {
     alignItems: 'center',
   },
   image: {
-    width: 126,
-    height: 126,
+    width: 109,
+    height: 128,
     marginRight: margin.large,
   },
   tab: {
@@ -310,19 +308,14 @@ const styles = {
     lineHeight: 15,
   },
   item: {
-    marginRight: margin.large,
-  },
-  progress: {
-    marginTop: 20,
-    fontSize: 9,
-  },
-  viewLoading: {
-    // marginVertical: margin.large,
-    // marginLeft: '50%',
-    marginTop: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginRight: margin.base,
   },
 };
 
+// const mapStateToProps = state => {
+//   return {
+//     auth: authSelector(state),
+//     dataReview: dataReviewSelector(state),
+//   };
+// };
 export default FeedbackScreen;

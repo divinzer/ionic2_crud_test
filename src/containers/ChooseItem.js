@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, TouchableOpacity, Image} from 'react-native';
 import {withTheme, Avatar} from 'src/components';
 
 import {white} from 'src/components/config/colors';
@@ -44,19 +44,26 @@ const ChooseItem = function (props) {
           style={[
             styles.touchView,
             {
-              backgroundColor: active ? colors.bgColorSelect : colors.bgColor,
+              // backgroundColor: active ? colors.bgColorSelect : colors.bgColor,
               borderColor: borderContentSub,
             },
             style && style,
           ]}
           onPress={() => onPress(item)}>
+          {/* <View style={styles.top}>
+            <Image
+              source={require('src/assets/images/pDefault.png')}
+              resizeMode="stretch"
+              // style={[styles.image, styles.marginBottom('small')]}
+            />
+          </View> */}
           <View style={styles.top}>{topElement}</View>
           <View style={styles.bottom}>{bottomElement}</View>
           {active ? (
             <Avatar
               rounded
               icon={{
-                name: 'check',
+                name: 'x',
                 size: 12,
                 color: white,
               }}

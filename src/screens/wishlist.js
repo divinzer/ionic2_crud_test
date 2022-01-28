@@ -17,7 +17,7 @@ import Button from 'src/containers/Button';
 import Container from 'src/containers/Container';
 import ButtonSwiper from 'src/containers/ButtonSwiper';
 import Input from 'src/containers/input/Input';
-import {handleError} from 'src/utils/error';
+import {handleError, showSuccess} from 'src/utils/error';
 
 import {
   FETCH_WEEKLY_CHECK,
@@ -58,13 +58,13 @@ const WishListScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [weekTitle, setWeekTitle] = useState('');
   const [selectedDoc, setSelectedDoc] = useState({id: '', weekName: ''});
-  const ref = firestore()
+  const weeklyRef = firestore()
     .collection('weeklyCheck')
     .where('isDeleted', '==', false)
     .orderBy('writtenAt', 'desc')
     .limit(8);
 
-  const refDB = firestore().collection('weeklyCheck');
+  const checklistRef = firestore().collection('weeklyCheck');
 
   // Handle user state changes
   function onAuthStateChanged(user) {
@@ -85,20 +85,22 @@ const WishListScreen = () => {
         .collection('checklist')
         .doc('checkItems');
       await CheckItemsRef.onSnapshot(documentSnapshot => {
-        const obj = documentSnapshot.data();
-        for (const item in documentSnapshot.data()['개인위생']) {
-          obj['개인위생'][item] = false;
-          obj['개인위생'].title = '키친 - 개인위생';
+        if (documentSnapshot) {
+          const obj = documentSnapshot.data();
+          for (const item in documentSnapshot.data()['개인위생']) {
+            obj['개인위생'][item] = false;
+            obj['개인위생'].title = '키친 - 개인위생';
+          }
+          for (const item in documentSnapshot.data()['식재관리']) {
+            obj['식재관리'][item] = false;
+            obj['식재관리'].title = '키친 - 식재관리';
+          }
+          for (const item in documentSnapshot.data()['조리장위생']) {
+            obj['조리장위생'][item] = false;
+            obj['조리장위생'].title = '키친 - 조리장위생';
+          }
+          setCheckItems(obj);
         }
-        for (const item in documentSnapshot.data()['식재관리']) {
-          obj['식재관리'][item] = false;
-          obj['식재관리'].title = '키친 - 식재관리';
-        }
-        for (const item in documentSnapshot.data()['조리장위생']) {
-          obj['조리장위생'][item] = false;
-          obj['조리장위생'].title = '키친 - 조리장위생';
-        }
-        setCheckItems(obj);
       });
     } catch (e) {
       // setLoading(false);
@@ -107,7 +109,7 @@ const WishListScreen = () => {
   const fetchData = async () => {
     dispatch({type: FETCH_WEEKLY_CHECK});
     try {
-      await ref.onSnapshot((querySnapshot, err) => {
+      await weeklyRef.onSnapshot((querySnapshot, err) => {
         const arr = [];
         if (querySnapshot) {
           querySnapshot.forEach(doc => {
@@ -134,7 +136,7 @@ const WishListScreen = () => {
     try {
       // const batch = firestore().batch();
       if (modalTitle === '생성' && weekTitle) {
-        const doc = await refDB.add({
+        const doc = await checklistRef.add({
           weekName: weekTitle,
           kitchenMemo: '',
           hasFeedback: false,
@@ -149,6 +151,9 @@ const WishListScreen = () => {
         setModal(false);
         setWeekTitle('');
         fetchData();
+        showSuccess({
+          message: '새로운 리스트가 생성되었습니다.',
+        });
       }
     } catch (e) {
       handleError({
@@ -162,13 +167,13 @@ const WishListScreen = () => {
       let doc = {...selectedDoc};
       doc.weekName = weekTitle;
       if (modalTitle === '주차이름 변경' && weekTitle) {
-        await refDB.doc(selectedDoc.id).set(doc);
+        await checklistRef.doc(selectedDoc.id).set(doc);
         setModal(false);
         setWeekTitle('');
         setSelectedDoc({});
         fetchData();
       } else {
-        await refDB.doc(selectedDoc.id).update({...doc, weekName: weekTitle});
+        await checklistRef.doc(selectedDoc.id).update({...doc, weekName: weekTitle});
         setModal(false);
         setWeekTitle('');
         setSelectedDoc({});
@@ -186,8 +191,8 @@ const WishListScreen = () => {
     let data = {...item};
     data.isDeleted = true;
     try {
-      // await refDB.doc(id).delete();
-      await refDB.doc(item.id).update({isDeleted: true});
+      // await checklistRef.doc(id).delete();
+      await checklistRef.doc(item.id).update({isDeleted: true});
       setModal(false);
       setWeekTitle('');
       setSelectedDoc({});
