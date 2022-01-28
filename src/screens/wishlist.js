@@ -140,7 +140,6 @@ const WishListScreen = () => {
           hasFeedback: false,
           isDeleted: false,
           writtenAt: Date(),
-          kitchen: [],
         });
         const feedbackItem = {개인위생: {}, 식재관리: {}, 조리장위생: {}};
         const firstDoc = await doc.collection('kitchen').add({});

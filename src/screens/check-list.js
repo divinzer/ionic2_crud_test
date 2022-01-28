@@ -20,12 +20,11 @@ import {TextHeader, SaveIcon, IconHeader} from 'src/containers/HeaderComponent';
 import {grey4, grey6, blue} from 'src/components/config/colors';
 import {handleError} from 'src/utils/error';
 
-// import {fetchChecklist} from 'src/modules/firebase/actions';
 import {
   FETCH_CHECK_LIST,
   FETCH_CHECK_LIST_SUCCESS,
   FETCH_CHECK_LIST_ERROR,
-  CHANGE_CHECK_FEEDBACK,
+  // CHANGE_CHECK_FEEDBACK,
   CHANGE_CHECK_LIST,
   CHANGE_CHECK_LIST_SUCCESS,
   CHANGE_CHECK_LIST_ERROR,
@@ -49,6 +48,7 @@ const CheckListScreen = props => {
   const navigation = useNavigation();
   const {route} = props;
   const fId = route.params.item.id;
+  console.log('fId: ', fId);
   const weekItem = route.params.item;
   const dispatch = useDispatch();
   const [kitchenCheckItems, setKitchenCheckItems] = useState({
@@ -98,7 +98,10 @@ const CheckListScreen = props => {
         type: CHANGE_CHECK_LIST_SUCCESS,
         payload: {name: ck, value: checked},
       });
-      await weeklyRef.collection('kitchen').doc('checklist').update(newCheckItem);
+      await weeklyRef
+        .collection('kitchen')
+        .doc('checklist')
+        .update(newCheckItem);
       setKitchenCheckItems(newCheckItem);
       fetchKitchenList();
     } catch (e) {
@@ -122,22 +125,24 @@ const CheckListScreen = props => {
         .collection('kitchen')
         .get()
         .then(documentSnapshot => {
+
+          // check feedback
           if (documentSnapshot) {
             const feedback = documentSnapshot.docs[1].data();
-            // console.log('feedback: ', feedback);
-            const obj = merge(
-              feedback['개인위생'],
-              feedback['식재관리'],
-              feedback['조리장위생'],
-            );
-            for (const item in obj) {
-              if (obj[item]) {
-                dispatch({
-                  type: CHANGE_CHECK_FEEDBACK,
-                  payload: {name: item, value: obj[item]},
-                });
-              }
-            }
+          //   // console.log('feedback: ', feedback);
+          //   const obj = merge(
+          //     feedback['개인위생'],
+          //     feedback['식재관리'],
+          //     feedback['조리장위생'],
+          //   );
+          //   for (const item in obj) {
+          //     if (obj[item]) {
+          //       dispatch({
+          //         type: CHANGE_CHECK_FEEDBACK,
+          //         payload: {name: item, value: obj[item]},
+          //       });
+          //     }
+          //   }
 
             // chkeck in checked
             // console.log('aaa', documentSnapshot.docs[0].data()['조리장위생']);

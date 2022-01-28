@@ -38,7 +38,6 @@ const stateSelector = createStructuredSelector({
 
 const FeedbackScreen = props => {
   const {item, fId, kitchenCheckItems} = props.route.params || '';
-  console.log('fId: ', fId)
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const {loading, checkList} = useSelector(stateSelector);
