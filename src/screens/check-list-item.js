@@ -8,14 +8,14 @@ import CheckBox from 'src/components/checkbox/CheckBox';
 
 import {margin, padding} from 'src/components/config/spacing';
 import {red, black, grey4} from 'src/components/config/colors';
-import {mainStack} from 'src/config/navigator';
+import {rootSwitch} from 'src/config/navigator';
 
 const CheckListItem = React.memo(props => {
   const navigation = useNavigation();
   const {item, onChecked, fId, onModal, kitchenCheckItems} = props;
   // console.log('item: ', item);
   const goFeedback = () =>
-    navigation.navigate(mainStack.feedback, {
+    navigation.navigate(rootSwitch.feedback, {
       item,
       fId,
       kitchenCheckItems,

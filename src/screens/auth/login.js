@@ -1,20 +1,49 @@
 import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {createStructuredSelector} from 'reselect';
+import {useSelector, useDispatch} from 'react-redux';
 import {StyleSheet, KeyboardAvoidingView, View} from 'react-native';
 import {Header, ThemedView, Button, Text, ThemeConsumer, Modal} from 'src/components';
 import Container from 'src/containers/Container';
 import Input from 'src/containers/input/Input';
 import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
-import NavigationServices from 'src/utils/navigation';
-import {rootSwitch, mainStack} from 'src/config/navigator';
+// import NavigationServices from 'src/utils/navigation';
+import {rootSwitch} from 'src/config/navigator';
 import {showSuccess} from 'src/utils/error';
 import {margin} from 'src/components/config/spacing';
 
+import {
+  SIGN_IN_WITH_FIREBASE,
+  SIGN_IN_WITH_FIREBASE_SUCCESS,
+  SIGN_IN_WITH_FIREBASE_ERROR,
+  FETCH_AUTH,
+  FETCH_AUTH_SUCCESS,
+  FETCH_AUTH_ERROR,
+} from 'src/modules/firebase/constants';
+
+import {
+  loadingListSelector,
+  isLoginSelector,
+  authSelector,
+  userSelector,
+} from 'src/modules/firebase/selectors';
+
+const stateSelector = createStructuredSelector({
+  loading: loadingListSelector(),
+  isLogin: isLoginSelector(),
+  authState: authSelector(),
+  user: userSelector(),
+});
+
 const LoginScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const {loading, isLogin, authState, user} = useSelector(stateSelector);
+  // console.log('user: ', user);
   const [initializing, setInitializing] = useState(true);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [errors, setError] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -27,29 +56,53 @@ const LoginScreen = () => {
   }
 
   const handleLogin = async () => {
-    // dispatch(signInWithEmail({username, password}));
-    setLoading(true);
+    dispatch({type: SIGN_IN_WITH_FIREBASE});
     try {
-      await auth().signInWithEmailAndPassword(username, password);
-      setLoading(false);
-      navigation.navigate(rootSwitch.main);
+      const logined = await auth().signInWithEmailAndPassword(
+        username,
+        password,
+      );
+      // console.log('logined', logined.user._user);
+      dispatch({type: SIGN_IN_WITH_FIREBASE_SUCCESS, payload: logined.user});
+      // navigation.navigate(rootSwitch.wish_list);
     } catch (e) {
-      // setError(e);
+      dispatch({type: SIGN_IN_WITH_FIREBASE_ERROR, payload: e});
       setError({message: '이메일 또는 비밀번호가 맞지 않습니다.'});
-      setLoading(false);
     }
   };
 
   const checkLogin = async () => {
-    const currentUser = await auth().currentUser;
-    if (currentUser) {
-      // navigation.navigate(rootSwitch.main);
-      NavigationServices.navigate(rootSwitch.main, {
-        screen: mainStack.wish_list,
-      });
+    dispatch({type: FETCH_AUTH});
+    try {
+      const currentUser = await auth().currentUser;
+      console.log('currentUser: ', currentUser._user);
+      if (currentUser._user) {
+        dispatch({type: SIGN_IN_WITH_FIREBASE_SUCCESS, payload: currentUser});
+        // navigation.navigate(rootSwitch.wish_list);
+      }
+    } catch (e) {
+      dispatch({type: FETCH_AUTH_ERROR, payload: e});
     }
   };
 
+  const checkAuth = async () => {
+    dispatch({type: FETCH_AUTH});
+    try {
+      if (user.uid) {
+        const checkAuth = await firestore()
+          .collection('users')
+          .doc(user.uid)
+          .get()
+          .then(documentSnapshot => {
+            return documentSnapshot.data();
+          });
+        dispatch({type: FETCH_AUTH_SUCCESS, payload: checkAuth});
+      }
+    } catch (e) {
+      dispatch({type: FETCH_AUTH_ERROR, payload: e});
+      setError({message: '권한이 없습니다.'});
+    }
+  };
   const sendEmail = async () => {
     try {
       await auth().sendPasswordResetEmail(email);
@@ -62,7 +115,7 @@ const LoginScreen = () => {
   };
 
   useEffect(() => {
-    checkLogin();
+    // checkLogin();
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
   }, []);

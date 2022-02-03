@@ -51,12 +51,10 @@ const FeedbackScreen = props => {
       if (!media.didCancel) {
         // Upload Process
         setUploading(true);
-        console.log('mm', media);
         const result = await imageCompress.Image.compress(media.assets[0].uri, {
           maxWidth: 1024,
           quality: 0.8,
         });
-        console.log('rr', result);
         const reference = await storage().ref(
           `feedbackImage/${fId}/kitchen/${item.checkName}/${media.assets[0].fileName}`,
         );

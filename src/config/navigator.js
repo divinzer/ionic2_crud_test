@@ -18,8 +18,8 @@ export const homeTabs = {
 };
 
 export const mainStack = {
+  login: 'LoginScreen',
   wish_list: 'WishListScreen',
-  // home_tab: 'HomeTab',
   check_list: 'CheckListStack',
   feedback: 'FeedbackScreen',
   // blog: 'BlogScreen',
@@ -65,7 +65,11 @@ export const mainStack = {
 
 export const rootSwitch = {
   auth: 'AuthStack',
-  main: 'MainStack',
+  // main: 'MainStack',
   start: 'GetStartScreen',
   loading: 'LoadingScreen',
+  login: 'LoginScreen',
+  wish_list: 'WishListScreen',
+  check_list: 'CheckListStack',
+  feedback: 'FeedbackScreen',
 };

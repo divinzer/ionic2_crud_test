@@ -272,6 +272,7 @@ const CheckListScreen = props => {
           dispatch({type: FETCH_CHECK_LIST_SUCCESS, payload: total});
         }
       });
+      fetchKitchenList();
     } catch (e) {
       dispatch({type: FETCH_CHECK_LIST_ERROR, payload: e});
     }
@@ -283,7 +284,7 @@ const CheckListScreen = props => {
         ...weekItem,
         kitchenMemo: memo,
       });
-      fetchKitchenList();
+      // fetchKitchenList();
       showSuccess({
         message: '피드백이 저장되었습니다.',
       });
@@ -336,7 +337,6 @@ const CheckListScreen = props => {
           },
         }));
       fetchCheckList();
-      fetchKitchenList();
       setModal('');
     } catch (e) {
       console.log('e', e);
@@ -369,9 +369,6 @@ const CheckListScreen = props => {
 
   useEffect(() => {
     fetchCheckList();
-    setTimeout(() => {
-      fetchKitchenList();
-    }, 0);
     const willFocusSubscription = navigation.addListener('focus', () => {
       fetchKitchenList();
     });

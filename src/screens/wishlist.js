@@ -31,7 +31,7 @@ import {
 } from 'src/modules/firebase/selectors';
 
 import {margin} from 'src/components/config/spacing';
-import {authStack, rootSwitch, mainStack} from '../config/navigator';
+import {rootSwitch} from 'src/config/navigator';
 
 import {LogBox} from 'react-native';
 LogBox.ignoreLogs(['Sending']);
@@ -65,7 +65,7 @@ const WishListScreen = () => {
     .limit(8);
 
   const checklistRef = firestore().collection('weeklyCheck');
-
+  let willFocusSubscription = null;
   // Handle user state changes
   function onAuthStateChanged(user) {
     setUser(user);
@@ -81,10 +81,10 @@ const WishListScreen = () => {
 
   const fetchCheckItems = async () => {
     try {
-      const CheckItemsRef = firestore()
+      const checkItemsRef = firestore()
         .collection('checklist')
         .doc('checkItems');
-      await CheckItemsRef.onSnapshot(documentSnapshot => {
+      await checkItemsRef.onSnapshot(documentSnapshot => {
         if (documentSnapshot) {
           const obj = documentSnapshot.data();
           for (const item in documentSnapshot.data()['개인위생']) {
@@ -212,11 +212,15 @@ const WishListScreen = () => {
   }, []);
 
   useEffect(() => {
-    const willFocusSubscription = navigation.addListener('focus', () => {
+    willFocusSubscription = navigation.addListener('focus', () => {
       fetchData();
     });
     return willFocusSubscription;
-  }, [weeklyCheck]);
+  }, [navigation]);
+
+  const removeListener = () => {
+    willFocusSubscription.remove();
+  };
 
   const onModal = (title, name, doc = 0) => {
     setModalTitle(title);
@@ -232,7 +236,7 @@ const WishListScreen = () => {
           icon="heart"
           title={'데이터가 없습니다.'}
           titleButton={'로그인 페이지로 가기'}
-          clickButton={() => navigation.navigate(authStack.login)}
+          clickButton={() => navigation.navigate(rootSwitch.login)}
         />
       );
     }
@@ -266,17 +270,17 @@ const WishListScreen = () => {
     );
   };
 
-  if (initializing) return null;
+  // if (!user) {
+  //   NavigationServices.navigate(rootSwitch.auth, {screen: rootSwitch.login});
+  // }
 
-  if (!user) {
-    NavigationServices.navigate(rootSwitch.auth, {screen: authStack.login});
-  }
+  if (initializing) return null;
 
   return (
     <ThemedView style={styles.container}>
       <Header
         centerComponent={<TextHeader title={'위생점검 리스트'} />}
-        rightComponent={<CartIcon />}
+        rightComponent={<CartIcon removeListener={removeListener} />}
       />
       {loading ? (
         <View style={styles.viewLoading}>

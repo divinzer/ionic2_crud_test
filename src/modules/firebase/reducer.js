@@ -10,6 +10,7 @@ export const initState = {
   isLogin: false,
   loading: false,
   user: {},
+  auth: '',
   token: '',
   error: initError,
   checkList: [],
@@ -33,19 +34,43 @@ const firebaseReducer = produce((draft, action) => {
       break;
     case Actions.SIGN_IN_WITH_FIREBASE_SUCCESS:
       draft.loading = false;
-      draft.user = payload.user;
       draft.isLogin = true;
+      draft.user = payload._user;
       draft.token = payload.token;
       break;
     case Actions.SIGN_IN_WITH_FIREBASE_ERROR:
       const errorSignIn = notificationMessage(payload);
       draft.loading = false;
+      draft.isLogin = false;
       draft.error = errorSignIn;
       break;
     // sign out
     case Actions.SIGN_OUT_SUCCESS:
-      draft = initState;
+      // draft = initState;
+      draft.loading = false;
+      draft.user = {};
+      draft.token = '';
+      draft.isLogin = false;
+      draft.auth = '';
       draft.error = initError;
+      draft.checkList = [];
+      draft.check = {};
+      draft.weeklyCheck = [];
+      break;
+    // Auth
+    case Actions.FETCH_AUTH:
+      draft.loading = true;
+      draft.error = initError;
+      break;
+    case Actions.FETCH_AUTH_SUCCESS:
+      draft.auth = payload.role;
+      draft.isLogin = true;
+      draft.loading = false;
+      break;
+    case Actions.FETCH_AUTH_ERROR:
+      draft.loading = false;
+      draft.isLogin = false;
+      draft.error = notificationMessage(payload);
       break;
     // Check List
     case Actions.FETCH_CHECK_LIST:
@@ -53,7 +78,6 @@ const firebaseReducer = produce((draft, action) => {
       draft.error = initError;
       break;
     case Actions.FETCH_CHECK_LIST_SUCCESS:
-      draft.checkList = payload;
       draft.checkList = payload;
       draft.loading = false;
       break;
@@ -124,7 +148,7 @@ const firebaseReducer = produce((draft, action) => {
         const {auth} = payload;
         return {
           ...draft,
-          user: auth.user,
+          // user: auth.user,
           token: auth.token,
           isLogin: auth.isLogin,
         };

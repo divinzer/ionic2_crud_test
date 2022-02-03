@@ -1,10 +1,12 @@
 import React from 'react';
 
 import {createStackNavigator} from '@react-navigation/stack';
-
-import {rootSwitch} from 'src/config/navigator';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
+import {rootSwitch} from 'src/config/navigator';
+
+// import MainStack from './main-stack';
+// import AuthStack from './auth-stack';
 
 import Loading from 'src/screens/loading';
 import GetStart from 'src/screens/get-start';
@@ -18,22 +20,34 @@ import {
   requiredLoginSelector,
 } from 'src/modules/common/selectors';
 import {isLoginSelector} from 'src/modules/firebase/selectors';
-import {connect} from 'react-redux';
+// import {connect} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
-import {SUPPORT_DIGITS_PLUGIN} from 'src/config/auth';
+// import {SUPPORT_DIGITS_PLUGIN} from 'src/config/auth';
 
 const Stack = createStackNavigator();
 
 const stateSelector = createStructuredSelector({
+  isGettingStart: isGettingStartSelector(),
+  loading: isLoginSelector(),
   isLogin: isLoginSelector(),
+  loginRequired: requiredLoginSelector(),
 });
 
-function RootStack({loading, isGettingStart, loginRequired}) {
+// const mapStateToProps = state => {
+//   return {
+//     isGettingStart: isGettingStartSelector(state),
+//     isLogin: isLoginSelector(state),
+//     loading: loadingSelector(state),
+//     loginRequired: requiredLoginSelector(state),
+//   };
+// };
+
+const RootStack = () => {
   /**
    * Hide Splash after fetch data
    */
-  const {isLogin} = useSelector(stateSelector);
-  console.log('isLogin', isLogin);
+  const {loading, isLogin} = useSelector(stateSelector);
+  console.log('aa0', isLogin);
   if (!loading) {
     SplashScreen.hide();
   }
@@ -72,14 +86,6 @@ function RootStack({loading, isGettingStart, loginRequired}) {
       )}
     </Stack.Navigator>
   );
-}
-
-const mapStateToProps = state => {
-  return {
-    isGettingStart: isGettingStartSelector(state),
-    loading: loadingSelector(state),
-    loginRequired: requiredLoginSelector(state),
-  };
 };
 
-export default connect(mapStateToProps)(RootStack);
+export default RootStack;

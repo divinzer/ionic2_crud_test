@@ -27,7 +27,7 @@ export function isLogin() {
 
 export function checkAuth() {
   return {
-    type: Actions.CHECK_AUTH,
+    type: Actions.FETCH_AUTH,
   };
 }
 
@@ -37,7 +37,7 @@ export function checkAuth() {
  */
 export function signOut() {
   return {
-    type: Actions.SIGN_OUT,
+    type: Actions.SIGN_OUT_SUCCESS,
   };
 }
 

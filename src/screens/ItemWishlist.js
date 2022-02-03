@@ -7,7 +7,7 @@ import {StyleSheet, View, TouchableOpacity} from 'react-native';
 import {Icon, Text, Button, ThemeConsumer} from 'src/components';
 
 import {configsSelector} from 'src/modules/common/selectors';
-import {mainStack} from 'src/config/navigator';
+import {rootSwitch} from 'src/config/navigator';
 import {withAddToCart} from 'src/hoc/hoc-add-to-card';
 
 // import {SIMPLE} from 'src/config/product';
@@ -22,7 +22,7 @@ const ItemWishlist = React.memo(props => {
   const {item, style, configs, loading, onModal} = props;
   const {weekName, type, isDeleted, hasFeedback, id, kitchenMemo, writeenAt} = item;
   const goCheckList = () =>
-    navigation.navigate(mainStack.check_list, {
+    navigation.navigate(rootSwitch.check_list, {
       item,
     });
 

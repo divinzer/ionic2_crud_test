@@ -4,7 +4,7 @@ import {mainStack} from 'src/config/navigator';
 
 import {createStackNavigator} from '@react-navigation/stack';
 
-// import HomeTabs from './home-tabs';
+import Login from 'src/screens/auth/login';
 import CheckListScreen from 'src/screens/check-list';
 import FeedbackScreen from 'src/screens/feedback';
 import WishListScreen from 'src/screens/wishlist';
@@ -59,6 +59,11 @@ function MainStack() {
         name={mainStack.home_tab}
         component={HomeTabs}
       /> */}
+      <Stack.Screen
+        options={{headerShown: false}}
+        name={mainStack.login}
+        component={Login}
+      />
       <Stack.Screen
         options={{headerShown: false}}
         name={mainStack.wish_list}

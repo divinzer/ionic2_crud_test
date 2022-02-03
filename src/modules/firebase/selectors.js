@@ -2,7 +2,7 @@ import {createSelector} from 'reselect';
 import {initialState} from './reducer';
 
 export const firebase = state => state.firebase || initialState;
-export const authSelector = () => createSelector(firebase, data => data);
+export const authSelector = () => createSelector(firebase, data => data.auth);
 
 export const isLoginSelector = () =>
   createSelector(firebase, data => data.isLogin);
@@ -10,8 +10,7 @@ export const isLoginSelector = () =>
 /**
  * Get user id
  */
-export const userIdSelector = () =>
-  createSelector(firebase, data => data.user.ID);
+export const userSelector = () => createSelector(firebase, data => data.user);
 
 /**
  * Token selector
