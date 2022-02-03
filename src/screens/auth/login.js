@@ -8,7 +8,7 @@ import Input from 'src/containers/input/Input';
 import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
 import NavigationServices from 'src/utils/navigation';
 import {rootSwitch, mainStack} from 'src/config/navigator';
-import {handleError} from 'src/utils/error';
+import {showSuccess} from 'src/utils/error';
 import {margin} from 'src/components/config/spacing';
 
 const LoginScreen = () => {
@@ -53,10 +53,10 @@ const LoginScreen = () => {
   const sendEmail = async () => {
     try {
       await auth().sendPasswordResetEmail(email);
-      handleError({message: '메일이 발송되었습니다.'});
+      showSuccess({message: '메일이 발송되었습니다.'});
       setModal(false);
     } catch (e) {
-      handleError({message: e});
+      showSuccess({message: e});
       // console.log('e', e);
     }
   };

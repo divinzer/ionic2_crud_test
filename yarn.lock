@@ -6179,6 +6179,11 @@ react-native-communications@^2.2.1:
   resolved "https://registry.npmjs.org/react-native-communications/-/react-native-communications-2.2.1.tgz"
   integrity sha1-eIO1ayCgAu63kMET+GFuqGksp5U=
 
+react-native-compressor@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-compressor/-/react-native-compressor-1.5.0.tgz#3bf1292f885b293eb3665a3986a6695b718a4571"
+  integrity sha512-sLzUSMSKLvEHVb6necOkeCRO1Tb44lhpBkX590c7orZLJ469tsEQAPvpM1UQ0LrD7wCDAINrwX8lHBBGCmcBdg==
+
 react-native-confirmation-code-field@^7.2.0:
   version "7.2.0"
   resolved "https://registry.npmjs.org/react-native-confirmation-code-field/-/react-native-confirmation-code-field-7.2.0.tgz"

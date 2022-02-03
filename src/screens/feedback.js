@@ -6,6 +6,7 @@ import {useNavigation} from '@react-navigation/native';
 // import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {View, ScrollView, Image, KeyboardAvoidingView, TouchableOpacity, ActivityIndicator} from 'react-native';
+import imageCompress from 'react-native-compressor';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {sortBy, merge, includes} from 'lodash';
 import {Header, Text, ThemedView} from 'src/components';
@@ -30,7 +31,7 @@ import {margin} from 'src/components/config/spacing';
 
 const FeedbackScreen = props => {
   const {item, fId, kitchenCheckItems} = props.route.params || '';
-  console.log('item: ', item.checkName);
+  // console.log('item: ', item);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [checked, setChecked] = useState(item.checked);
@@ -44,27 +45,56 @@ const FeedbackScreen = props => {
     `feedbackImage/${fId}/kitchen/${item.checkName}`,
   );
 
-  // for Image Selectore
-  const onMediaSelect = async media => {
-    if (!media.didCancel) {
-      // Upload Process
-      setUploading(true);
-      const reference = await storage().ref(
-        `feedbackImage/${fId}/kitchen/${item.checkName}/${media.assets[0].fileName}`,
-      );
-      const task = reference.putFile(media.assets[0].uri);
-      task.on('state_changed', (taskSnapshot) => {
-        setUploadTaskSnapshot(taskSnapshot);
-      });
-      task.then(() => {
-        fetchImages();
-        setUploading(false);
+  // for Image Upload
+  const onMediaUpload = async media => {
+    try {
+      if (!media.didCancel) {
+        // Upload Process
+        setUploading(true);
+        console.log('mm', media);
+        const result = await imageCompress.Image.compress(media.assets[0].uri, {
+          maxWidth: 1024,
+          quality: 0.8,
+        });
+        console.log('rr', result);
+        const reference = await storage().ref(
+          `feedbackImage/${fId}/kitchen/${item.checkName}/${media.assets[0].fileName}`,
+        );
+        const task = reference.putFile(result);
+        task.on('state_changed', taskSnapshot => {
+          setUploadTaskSnapshot(taskSnapshot);
+        });
+        task.then(() => {
+          fetchImages();
+          setUploading(false);
+        });
+      }
+    } catch (e) {
+      setUploading(false);
+      handleError({
+        message: '파일을 업로드하지 못했습니다. 관리자에게 문의하세요',
       });
     }
   };
 
   const onSelectImagePress = () =>
-    launchImageLibrary({ mediaType: 'image' }, onMediaSelect);
+    launchImageLibrary({mediaType: 'image'}, onMediaUpload);
+
+  // for Image Delete
+  const onMediaDelete = async media => {
+    // console.log('media', media);
+    try {
+      // Delete Process
+      const desertRef = await storage().ref(media.path);
+      await desertRef.delete();
+      showSuccess({message: '파일을 삭제했습니다.'});
+      fetchImages();
+    } catch (e) {
+      handleError({
+        message: '파일을 삭제하지 못했습니다. 관리자에게 문의하세요',
+      });
+    }
+  };
 
   const onChecked = async () => {
     dispatch({type: CHANGE_CHECK_LIST});
@@ -152,13 +182,14 @@ const FeedbackScreen = props => {
     await stoageRef.list().then(result => {
       if (result.items.length > 0) {
         result.items.forEach(ref => {
+          console.log('ref: ', ref);
           storage()
             .ref(ref.fullPath)
             .getDownloadURL()
             .then(url => {
               setImagesUrl(imagesUrl => [
                 ...imagesUrl,
-                {id: i.toString(), url: url},
+                {id: i.toString(), url: url, path: ref.path},
               ]);
               i++;
             });
@@ -186,6 +217,7 @@ const FeedbackScreen = props => {
         key={img.id}
         item={img}
         onPress={() => selectMethod(img.id)}
+        onDelete={onMediaDelete}
         active={selectedM && img.id && img.id === selectedM}
         topElement={topElement}
         // bottomElement={bottomElement}
@@ -193,13 +225,6 @@ const FeedbackScreen = props => {
       />
     );
   };
-  // const topElement = (
-  //   <Image
-  //     source={require('src/assets/images/pDefault.png')}
-  //     style={styles.imageItem}
-  //     resizeMode="stretch"
-  //   />
-  // );
 
   return (
     <ThemedView isFullView>

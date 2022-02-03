@@ -13,7 +13,7 @@ import {mainStack} from 'src/config/navigator';
 const CheckListItem = React.memo(props => {
   const navigation = useNavigation();
   const {item, onChecked, fId, onModal, kitchenCheckItems} = props;
-  console.log('item: ', item.feedback);
+  // console.log('item: ', item);
   const goFeedback = () =>
     navigation.navigate(mainStack.feedback, {
       item,

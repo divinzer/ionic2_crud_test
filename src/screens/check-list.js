@@ -106,13 +106,12 @@ const CheckListScreen = props => {
       fetchKitchenList();
     } catch (e) {
       dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
-      console.log('e', e);
     }
   };
 
   const onModal = (type, data) => {
-    console.log('type: ', type);
-    console.log('data: ', data);
+    // console.log('type: ', type);
+    // console.log('data: ', data);
     // type: new, title, item
     setModal(type);
     setSelectedData(data);
@@ -189,7 +188,6 @@ const CheckListScreen = props => {
           }
         });
     } catch (e) {
-      console.log('e: ', e);
       dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
     }
   };
@@ -298,7 +296,6 @@ const CheckListScreen = props => {
       handleError({
         message: '피드백이 저장되지 못했습니다. 관리자에게 문의하세요',
       });
-      console.log('e', e);
     }
   };
 

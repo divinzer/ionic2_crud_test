@@ -10,12 +10,13 @@ const ChooseItem = function (props) {
   const {
     active,
     topElement,
-    bottomElement,
+    // bottomElement,
     colorSelect,
     containerStyle,
     style,
     theme,
     onPress,
+    onDelete,
     item,
   } = props;
   const {ChooseItem: colors} = theme;
@@ -58,21 +59,23 @@ const ChooseItem = function (props) {
             />
           </View> */}
           <View style={styles.top}>{topElement}</View>
-          <View style={styles.bottom}>{bottomElement}</View>
+          {/* <View style={styles.bottom}>{bottomElement}</View> */}
           {active ? (
-            <Avatar
-              rounded
-              icon={{
-                name: 'x',
-                size: 12,
-                color: white,
-              }}
-              size={20}
-              containerStyle={styles.icon}
-              overlayContainerStyle={{
-                backgroundColor: colorSelect ?? colors.iconSelect,
-              }}
-            />
+            <TouchableOpacity onPress={() => onDelete(item)}>
+              <Avatar
+                rounded
+                icon={{
+                  name: 'x',
+                  size: 12,
+                  color: white,
+                }}
+                size={20}
+                containerStyle={styles.icon}
+                overlayContainerStyle={{
+                  backgroundColor: colorSelect ?? colors.iconSelect,
+                }}
+              />
+            </TouchableOpacity>
           ) : null}
         </TouchableOpacity>
       </View>
@@ -102,13 +105,8 @@ const styles = StyleSheet.create({
   icon: {
     position: 'absolute',
     right: -10,
-    top: -10,
+    top: -136,
   },
 });
-
-ChooseItem.defaultProps = {
-  active: false,
-  onPress: () => {},
-};
 
 export default withTheme(ChooseItem);

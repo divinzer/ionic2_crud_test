@@ -42,6 +42,7 @@
     "react": "17.0.2",
     "react-i18next": "^11.15.1",
     "react-native": "0.66.4",
+    "react-native-compressor": "^1.5.0",
     "react-native-confirmation-code-field": "^7.2.0",
     "react-native-debugger-open": "^0.3.25",
     "react-native-fbsdk": "^3.0.0",
