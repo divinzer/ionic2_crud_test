@@ -3,7 +3,7 @@ import {fromJS, Map} from 'immutable';
 import {createSelector} from 'reselect';
 import * as Actions from './constants';
 import {isLoginSelector} from 'src/modules/auth/selectors';
-import {imagesTheme} from 'src/config/images';
+// import {imagesTheme} from 'src/config/images';
 import {rootSwitch} from 'src/config/navigator';
 
 export const rootCommon = state => state.common;
@@ -108,10 +108,10 @@ export const themeSelector = createSelector(rootCommon, data => {
   return data.get('theme');
 });
 
-export const listImageSelector = createSelector(rootCommon, data => {
-  const theme = data.get('theme');
-  return theme && imagesTheme[theme] ? imagesTheme[theme] : imagesTheme.light;
-});
+// export const listImageSelector = createSelector(rootCommon, data => {
+//   const theme = data.get('theme');
+//   return theme && imagesTheme[theme] ? imagesTheme[theme] : imagesTheme.light;
+// });
 
 export const productViewSelector = createSelector(
   rootCommon,

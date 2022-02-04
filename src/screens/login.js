@@ -23,9 +23,7 @@ import {
   FETCH_AUTH_ERROR,
 } from 'src/modules/firebase/constants';
 
-import {
-  loadingListSelector,
-} from 'src/modules/firebase/selectors';
+import {loadingListSelector} from 'src/modules/firebase/selectors';
 
 const stateSelector = createStructuredSelector({
   loading: loadingListSelector(),

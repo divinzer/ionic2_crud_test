@@ -53,7 +53,7 @@ const FeedbackScreen = props => {
 
   // for Image Upload
   const onMediaUpload = async media => {
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     try {
       if (!media.didCancel) {
         // Upload Process
@@ -83,13 +83,13 @@ const FeedbackScreen = props => {
   };
 
   const onSelectImagePress = () => {
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     return launchImageLibrary({mediaType: 'image'}, onMediaUpload);
   };
 
   // for Image Delete
   const onMediaDelete = async media => {
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     try {
       // Delete Process
       const desertRef = await storage().ref(media.path);
@@ -104,7 +104,7 @@ const FeedbackScreen = props => {
   };
 
   const onChecked = async () => {
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     dispatch({type: CHANGE_CHECK_LIST});
     let selected = '식재관리';
     if (includes(item.checkName, 'hygiene')) {
@@ -141,7 +141,7 @@ const FeedbackScreen = props => {
   };
 
   const onFeedback = async () => {
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     dispatch({type: CHANGE_CHECK_LIST});
     let selected = '식재관리';
     if (includes(item.checkName, 'hygiene')) {

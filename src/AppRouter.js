@@ -15,35 +15,25 @@
  */
 
 import React, {useState, useEffect} from 'react';
-
-import './config-i18n';
-
+// import './config-i18n';
 import {StatusBar} from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import {useSelector} from 'react-redux';
-
 import FlashMessage from 'react-native-flash-message';
-
-import {darkColors, getThemeLight} from './components/config/colors';
-
+import {getThemeLight} from './components/config/colors';
 import {ThemeProvider} from 'src/components';
 import Router from './navigation/root-switch';
 import Unconnected from './containers/Unconnected';
 
-import {themeSelector, colorsSelector} from './modules/common/selectors';
-
-const mapStateToProps = state => {
-  return {
-    theme: themeSelector(state),
-    colors: colorsSelector(state),
-  };
-};
-
 export default function AppRouter() {
-  const {theme, colors} = useSelector(mapStateToProps);
+  const colors = {
+    primary: '#121212',
+    secondary: '#777777',
+    bgColor: '#ffffff',
+    bgColorSecondary: '#f4f4f4',
+  };
 
-  const themeColor = theme === 'light' ? getThemeLight(colors) : darkColors;
-  const barStyle = theme === 'light' ? 'dark-content' : 'light-content';
+  const themeColor = getThemeLight(colors);
+  const barStyle = 'dark-content';
   const [isCheck, setCheck] = useState(false);
   const [isConnected, setConnected] = useState(true);
 

@@ -7,6 +7,7 @@ import {notificationMessage} from 'src/utils/error';
 const initError = '';
 
 export const initState = {
+  start: true,
   isLogin: false,
   loading: false,
   user: {
@@ -29,7 +30,14 @@ export const initState = {
 const firebaseReducer = produce((draft, action) => {
   const {type, payload} = action;
   switch (type) {
+    case Actions.START:
+      draft.start = false;
+      break;
     // auth
+    case Actions.SIGN_IN_WITH_FIREBASE:
+      draft.loading = true;
+      draft.error = initError;
+      break;
     case Actions.SIGN_IN_WITH_FIREBASE:
       draft.loading = true;
       draft.error = initError;
@@ -143,14 +151,11 @@ const firebaseReducer = produce((draft, action) => {
       draft.error = notificationMessage(payload);
       break;
     case REHYDRATE:
-      if (payload && payload.auth) {
+      if (payload) {
         // Restore only user and isLogin draft
-        const {auth} = payload;
         return {
           ...draft,
-          // user: auth.user,
-          token: auth.token,
-          isLogin: auth.isLogin,
+          isLogin: payload.isLogin || false,
         };
       } else {
         return initState;

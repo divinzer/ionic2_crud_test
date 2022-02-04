@@ -1,3 +1,4 @@
+export const START = 'firebase/START';
 export const SIGN_IN_WITH_FIREBASE = 'firebase/SIGN_IN_WITH_FIREBASE';
 export const SIGN_IN_WITH_FIREBASE_SUCCESS =
   'firebase/SIGN_IN_WITH_FIREBASE_SUCCESS';

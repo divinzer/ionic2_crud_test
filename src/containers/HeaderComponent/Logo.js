@@ -4,7 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 
 import {TouchableOpacity, Image} from 'react-native';
 
-import {listImageSelector} from 'src/modules/common/selectors';
+// import {listImageSelector} from 'src/modules/common/selectors';
 import {homeDrawer} from 'src/config/navigator';
 
 const Logo = ({images, ...rest}) => {
@@ -18,7 +18,7 @@ const Logo = ({images, ...rest}) => {
 
 const mapStateToProps = state => {
   return {
-    images: listImageSelector(state),
+    // images: listImageSelector(state),
   };
 };
 

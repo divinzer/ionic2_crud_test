@@ -22,9 +22,6 @@ import {handleError, showSuccess} from 'src/utils/error';
 import {margin} from 'src/components/config/spacing';
 import {rootSwitch} from 'src/config/navigator';
 
-import {LogBox} from 'react-native';
-LogBox.ignoreLogs(['Sending']);
-
 import {
   FETCH_WEEKLY_CHECK,
   FETCH_WEEKLY_CHECK_SUCCESS,
@@ -136,7 +133,7 @@ const WishListScreen = () => {
 
   const createData = async () => {
     console.log('role', role);
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'});}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'});}
     try {
       // const batch = firestore().batch();
       if (modalTitle === '생성' && weekTitle) {
@@ -167,7 +164,7 @@ const WishListScreen = () => {
   };
 
   const modifyData = async () => {
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'});}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'});}
     try {
       let doc = {...selectedDoc};
       doc.weekName = weekTitle;

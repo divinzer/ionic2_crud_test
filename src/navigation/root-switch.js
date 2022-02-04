@@ -7,39 +7,40 @@ import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 
 import Loading from 'src/screens/loading';
-import GetStart from 'src/screens/get-start';
-import Login from 'src/screens/auth/login';
+import Login from 'src/screens/login';
 import CheckListScreen from 'src/screens/check-list';
 import FeedbackScreen from 'src/screens/feedback';
 import WishListScreen from 'src/screens/wishlist';
+// import {
+//   loadingSelector,
+//   requiredLoginSelector,
+// } from 'src/modules/common/selectors';
 import {
   isGettingStartSelector,
-  loadingSelector,
-  requiredLoginSelector,
-} from 'src/modules/common/selectors';
-import {isLoginSelector} from 'src/modules/firebase/selectors';
+  isLoginSelector,
+} from 'src/modules/firebase/selectors';
 import {connect} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
-import {SUPPORT_DIGITS_PLUGIN} from 'src/config/auth';
 
 const Stack = createStackNavigator();
 
 const stateSelector = createStructuredSelector({
+  start: isGettingStartSelector(),
   isLogin: isLoginSelector(),
 });
 
-function RootStack({loading, isGettingStart, loginRequired}) {
+function RootStack({loading}) {
   /**
    * Hide Splash after fetch data
    */
-  const {isLogin} = useSelector(stateSelector);
+  const {start, isLogin} = useSelector(stateSelector);
   console.log('isLogin', isLogin);
   if (!loading) {
     SplashScreen.hide();
   }
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {loading ? (
+      {start ? (
         <Stack.Screen name={rootSwitch.loading} component={Loading} />
       ) : isLogin ? (
         <>
@@ -76,9 +77,9 @@ function RootStack({loading, isGettingStart, loginRequired}) {
 
 const mapStateToProps = state => {
   return {
-    isGettingStart: isGettingStartSelector(state),
-    loading: loadingSelector(state),
-    loginRequired: requiredLoginSelector(state),
+    // isGettingStart: isGettingStartSelector(state),
+    // loading: loadingSelector(state),
+    // loginRequired: requiredLoginSelector(state),
   };
 };
 

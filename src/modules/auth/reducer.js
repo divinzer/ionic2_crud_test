@@ -149,24 +149,24 @@ export default function authReducer(state = initState, action = {}) {
       return state.set('user', fromJS(user));
     case Actions.UPDATE_SHIPPING_ADDRESS_SUCCESS:
       return state.set('shippingAddress', fromJS(action.payload));
-    case REHYDRATE:
-      if (action.payload && action.payload.auth) {
-        // Restore only user and isLogin state
-        const {auth} = action.payload;
-        return initState.merge(
-          fromJS({
-            user: auth.get('user'),
-            token: auth.get('token'),
-            isLogin: auth.get('isLogin'),
-            shippingAddress:
-              auth.get('shippingAddress') || fromJS(shippingAddressInit),
-            billingAddress:
-              auth.get('billingAddress') || fromJS(billingAddressInit),
-          }),
-        );
-      } else {
-        return state;
-      }
+    // case REHYDRATE:
+    //   if (action.payload && action.payload.auth) {
+    //     // Restore only user and isLogin state
+    //     const {auth} = action.payload;
+    //     return initState.merge(
+    //       fromJS({
+    //         user: auth.get('user'),
+    //         token: auth.get('token'),
+    //         isLogin: auth.get('isLogin'),
+    //         shippingAddress:
+    //           auth.get('shippingAddress') || fromJS(shippingAddressInit),
+    //         billingAddress:
+    //           auth.get('billingAddress') || fromJS(billingAddressInit),
+    //       }),
+    //     );
+    //   } else {
+    //     return state;
+    //   }
     case 'UPDATE_DEMO_CONFIG_SUCCESS':
       return initState;
     case Actions.GET_LIST_FILE_DOWNLOAD:

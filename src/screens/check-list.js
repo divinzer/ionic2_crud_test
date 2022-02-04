@@ -6,17 +6,15 @@ import {useSelector, useDispatch} from 'react-redux';
 import {sortBy, merge, includes} from 'lodash';
 import {StyleSheet, ActivityIndicator, TouchableOpacity, View} from 'react-native';
 import {SwipeListView} from 'react-native-swipe-list-view';
-import Empty from 'src/containers/Empty';
 import {Row, Col} from 'src/containers/Gird';
 import {Header, Icon, ThemedView, Text, Modal} from 'src/components';
 import Input from 'src/containers/input/Input';
-import InputBasic from 'src/containers/input/InputBasic';
 import Button from 'src/containers/Button';
 import Container from 'src/containers/Container';
 import ButtonSwiper from 'src/containers/ButtonSwiper';
 import ButtonLeftSwiper from 'src/containers/ButtonLeftSwiper';
 import CheckListItem from './check-list-item';
-import {TextHeader, SaveIcon, IconHeader} from 'src/containers/HeaderComponent';
+import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
 import {grey4, grey6, blue} from 'src/components/config/colors';
 import {handleError, showSuccess} from 'src/utils/error';
 
@@ -143,51 +141,25 @@ const CheckListScreen = props => {
               }
             }
 
-            // chkeck in checked
-            for (const item in documentSnapshot.docs[0].data()['개인위생']) {
-              const value = documentSnapshot.docs[0].data()['개인위생'][item];
-              if (value === true) {
+            const check = documentSnapshot.docs[0].data();
+            const obj2 = merge(
+              check['개인위생'],
+              check['식재관리'],
+              check['조리장위생'],
+            );
+            for (const item in obj2) {
+              if (obj2[item]) {
                 dispatch({
                   type: CHANGE_CHECK_LIST_SUCCESS,
-                  payload: {name: item, value: value},
+                  payload: {name: item, value: obj2[item]},
                 });
-              }
-              if (item === 'title') {
-                setTitle0(value);
               }
             }
 
-            for (const item in documentSnapshot.docs[0].data()['식재관리']) {
-              let value = documentSnapshot.docs[0].data()['식재관리'][item];
-              // console.log('v1', item);
-              if (value === true) {
-                dispatch({
-                  type: CHANGE_CHECK_LIST_SUCCESS,
-                  payload: {name: item, value: value},
-                });
-              }
-              if (item === 'title') {
-                setTitle1(value);
-              }
-            }
-
-            for (const item in documentSnapshot.docs[0].data()['조리장위생']) {
-              let value = documentSnapshot.docs[0].data()['조리장위생'][item];
-
-              if (value === true) {
-                dispatch({
-                  type: CHANGE_CHECK_LIST_SUCCESS,
-                  payload: {name: item, value: value},
-                });
-              }
-              if (item === 'title') {
-                setTitle2(value);
-              }
-            }
             setKitchenCheckItems(documentSnapshot.docs[0].data());
+            setTotalLoading(false);
           }
         });
-      setTotalLoading(false);
     } catch (e) {
       dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
       setTotalLoading(false);
@@ -195,7 +167,7 @@ const CheckListScreen = props => {
   };
 
   const fetchCheckList = async () => {
-    setTotalLoading(true);
+    // setTotalLoading(true);
     let arr0 = [];
     let arr1 = [];
     let arr2 = [];
