@@ -6,11 +6,9 @@
 // Core
 import Button from './buttons/Button';
 import Input from './input/Input';
-import Input2 from './input/Input2';
 import Modal from './modal/Modal';
 
 import Icon from './icons/Icon';
-import ListItem from './list/ListItem';
 import SocialIcon from './social/SocialIcon';
 import Overlay from './overlay/Overlay';
 import ThemedView from './themedview/ThemedView';
@@ -29,7 +27,6 @@ import Image from './image/Image';
 // Productivity
 import Card from './card/Card';
 import Tile from './tile/Tile';
-import Avatar from './avatar/Avatar';
 import Header from './header/Header';
 import PricingCard from './pricing/PricingCard';
 import Tooltip from './tooltip/Tooltip';
@@ -57,9 +54,7 @@ export {
   ButtonGroup,
   Card,
   Input,
-  Input2,
   Modal,
-  ListItem,
   PricingCard,
   Tooltip,
   SocialIcon,
@@ -76,7 +71,6 @@ export {
   normalize,
   Tile,
   Slider,
-  Avatar,
   // Rating,
   // AirbnbRating,
   Header,

@@ -9,7 +9,6 @@ import {Header, ThemedView, Button, Text, Modal} from 'src/components';
 import Container from 'src/containers/Container';
 import Input from 'src/containers/input/Input';
 import {TextHeader} from 'src/containers/HeaderComponent';
-// import NavigationServices from 'src/utils/navigation';
 import {rootSwitch} from 'src/config/navigator';
 import {showSuccess} from 'src/utils/error';
 import {margin} from 'src/components/config/spacing';

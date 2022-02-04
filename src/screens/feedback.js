@@ -196,8 +196,8 @@ const FeedbackScreen = props => {
             .ref(ref.fullPath)
             .getDownloadURL()
             .then(url => {
-              setImagesUrl(imagesUrl => [
-                ...imagesUrl,
+              setImagesUrl(imagesUri => [
+                ...imagesUri,
                 {id: i.toString(), url: url, path: ref.path},
               ]);
               i++;

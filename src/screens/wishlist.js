@@ -2,16 +2,13 @@ import React, {useState, useEffect, useCallback} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
-// import isEqual from 'lodash/isEqual';
-
-import NavigationServices from 'src/utils/navigation';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {StyleSheet, View, ActivityIndicator, RefreshControl} from 'react-native';
 import {Header, ThemedView, Modal} from 'src/components';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import ItemWishlist from './ItemWishlist';
-import {TextHeader, CartIcon, IconHeader} from 'src/containers/HeaderComponent';
+import {TextHeader, SignOutIcon} from 'src/containers/HeaderComponent';
 import Empty from 'src/containers/Empty';
 import Button from 'src/containers/Button';
 import Container from 'src/containers/Container';
@@ -282,7 +279,7 @@ const WishListScreen = () => {
     <ThemedView style={styles.container}>
       <Header
         centerComponent={<TextHeader title={'위생점검 리스트'} />}
-        rightComponent={<CartIcon removeListener={removeListener} />}
+        rightComponent={<SignOutIcon removeListener={removeListener} />}
       />
       {loading ? (
         <View style={styles.viewLoading}>
