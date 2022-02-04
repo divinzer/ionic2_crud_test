@@ -1,25 +1,16 @@
 import React from 'react';
-import {compose} from 'redux';
-import {connect} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import unescape from 'lodash/unescape';
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
 import {Icon, Text, Button, ThemeConsumer} from 'src/components';
-
-import {configsSelector} from 'src/modules/common/selectors';
 import {rootSwitch} from 'src/config/navigator';
-import {withAddToCart} from 'src/hoc/hoc-add-to-card';
-
-// import {SIMPLE} from 'src/config/product';
 import {padding, margin} from 'src/components/config/spacing';
 import {sizes} from 'src/components/config/fonts';
 import {white, black, orange, grey4} from 'src/components/config/colors';
 
-// const stockStatusList = ['instock', 'onbackorder'];
-
 const ItemWishlist = React.memo(props => {
   const navigation = useNavigation();
-  const {item, style, configs, loading, onModal} = props;
+  const {item, style, onModal} = props;
   const {weekName, type, isDeleted, hasFeedback, id, kitchenMemo, writeenAt} = item;
   const goCheckList = () =>
     navigation.navigate(rootSwitch.check_list, {
@@ -136,13 +127,5 @@ const styles = StyleSheet.create({
     fontSize: sizes.h6,
   },
 });
-const mapStateToProps = state => {
-  return {
-    configs: configsSelector(state).toJS(),
-  };
-};
 
-export default compose(
-  connect(mapStateToProps, null),
-  withAddToCart,
-)(ItemWishlist);
+export default ItemWishlist;

@@ -1,7 +1,7 @@
 import React, {useReducer} from 'react';
 
 import {useBoolean} from 'src/utils/use-boolean';
-import {addToCart} from 'src/modules/cart/actions';
+// import {addToCart} from 'src/modules/cart/actions';
 import {showMessage} from 'react-native-flash-message';
 
 /**
@@ -88,18 +88,18 @@ export function withAddToCart(WrappedComponent) {
         dataVariation[nameAttr] = value.option;
       });
       setTrue();
-      props.dispatch(
-        addToCart(
-          {
-            product_id: id,
-            quantity,
-            variation_id,
-            cart_item_data,
-            variation: dataVariation,
-          },
-          data => callBack(data, cb),
-        ),
-      );
+      // props.dispatch(
+      //   addToCart(
+      //     {
+      //       product_id: id,
+      //       quantity,
+      //       variation_id,
+      //       cart_item_data,
+      //       variation: dataVariation,
+      //     },
+      //     data => callBack(data, cb),
+      //   ),
+      // );
     };
 
     /**

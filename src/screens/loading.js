@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {fetchSettingSuccess} from 'src/modules/common/actions';
 import {isLogin} from 'src/modules/auth/actions';
 import {isLoginSelector} from 'src/modules/auth/selectors';
-import {fetchCategories} from 'src/modules/category/actions';
+// import {fetchCategories} from 'src/modules/category/actions';
 import {fetchSetting} from 'src/modules/common/service';
 
 import SplashScreen from 'react-native-splash-screen';
@@ -26,7 +26,7 @@ class LoadingScreen extends React.Component<Props> {
    */
   bootstrapAsync = async () => {
     try {
-      const {initSetting, handleFetchCategories, isLoginBool, isLoginFc} =
+      const {initSetting, isLoginBool, isLoginFc} =
         this.props;
 
       // Fetch setting
@@ -46,8 +46,6 @@ class LoadingScreen extends React.Component<Props> {
         configs: configs,
         templates: templates,
       });
-      // Fetch categories
-      handleFetchCategories();
       // const router = isGettingStart ? rootSwitch.start : configs.requireLogin && !isLogin ? rootSwitch.auth : rootSwitch.main;
       // navigation.navigate(router);
       SplashScreen.hide();
@@ -69,7 +67,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
   initSetting: fetchSettingSuccess,
-  handleFetchCategories: fetchCategories,
   isLoginFc: isLogin,
 };
 

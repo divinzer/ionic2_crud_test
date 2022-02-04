@@ -67,6 +67,7 @@ const CheckListScreen = props => {
   const [title0, setTitle0] = useState('');
   const [title1, setTitle1] = useState('');
   const [title2, setTitle2] = useState('');
+  const [totalLoading, setTotalLoading] = useState(true);
   const [memo, setMemo] = useState(weekItem.kitchenMemo);
   const [selectedData, setSelectedData] = useState({name: '', order: ''});
   const [isModal, setModal] = useState('');
@@ -80,7 +81,7 @@ const CheckListScreen = props => {
     .doc('checkItems');
 
   const onChecked = async ck => {
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'});}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'});}
     dispatch({type: CHANGE_CHECK_LIST});
     let selected = '식재관리';
     if (includes(ck, 'hygiene')) {
@@ -106,7 +107,7 @@ const CheckListScreen = props => {
         .doc('checklist')
         .update(newCheckItem);
       setKitchenCheckItems(newCheckItem);
-      fetchKitchenList();
+      await fetchKitchenList();
     } catch (e) {
       dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
     }
@@ -186,12 +187,15 @@ const CheckListScreen = props => {
             setKitchenCheckItems(documentSnapshot.docs[0].data());
           }
         });
+      setTotalLoading(false);
     } catch (e) {
       dispatch({type: CHANGE_CHECK_LIST_ERROR, payload: e});
+      setTotalLoading(false);
     }
   };
 
   const fetchCheckList = async () => {
+    setTotalLoading(true);
     let arr0 = [];
     let arr1 = [];
     let arr2 = [];
@@ -271,14 +275,14 @@ const CheckListScreen = props => {
           dispatch({type: FETCH_CHECK_LIST_SUCCESS, payload: total});
         }
       });
-      fetchKitchenList();
+      await fetchKitchenList();
     } catch (e) {
       dispatch({type: FETCH_CHECK_LIST_ERROR, payload: e});
     }
   };
 
   const addMemo = async () => {
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     try {
       await weeklyRef.update({
         ...weekItem,
@@ -301,7 +305,7 @@ const CheckListScreen = props => {
   };
 
   const modifyData = async () => {
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     let selected = '식재관리';
     if (includes(selectedData.order, 'hygiene')) {
       selected = '개인위생';
@@ -336,7 +340,7 @@ const CheckListScreen = props => {
             [selectedData.order]: selectedData.name,
           },
         }));
-      fetchCheckList();
+      await fetchCheckList();
       setModal('');
     } catch (e) {
       console.log('e', e);
@@ -344,7 +348,7 @@ const CheckListScreen = props => {
   };
 
   const deleteData = async item => {
-    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
+    if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     let selected = '식재관리';
     if (includes(item.checkName, 'hygiene')) {
       selected = '개인위생';
@@ -361,7 +365,7 @@ const CheckListScreen = props => {
           [item.checkName]: 'clear-' + item.value,
         },
       });
-      fetchCheckList();
+      await fetchCheckList();
     } catch (e) {
       console.log('e', e);
     }
@@ -374,10 +378,6 @@ const CheckListScreen = props => {
     });
     return willFocusSubscription;
   }, [dispatch]);
-
-  // useEffect(() => {
-
-  // }, [checkList]);
 
   const itemList = item => {
     if (item.checkName === 'hygiene-1') {
@@ -542,7 +542,7 @@ const CheckListScreen = props => {
         // centerComponent={<TextHeader title={route.params.weekName} />}
         // rightComponent={<SaveIcon />}
       />
-      {loading || loading2 ? (
+      {totalLoading ? (
         <View style={styles.viewLoading}>
           <ActivityIndicator size="small" />
         </View>
