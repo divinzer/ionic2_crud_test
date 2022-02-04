@@ -19,6 +19,12 @@ import ButtonSwiper from 'src/containers/ButtonSwiper';
 import Input from 'src/containers/input/Input';
 import {handleError, showSuccess} from 'src/utils/error';
 
+import {margin} from 'src/components/config/spacing';
+import {rootSwitch} from 'src/config/navigator';
+
+import {LogBox} from 'react-native';
+LogBox.ignoreLogs(['Sending']);
+
 import {
   FETCH_WEEKLY_CHECK,
   FETCH_WEEKLY_CHECK_SUCCESS,
@@ -28,23 +34,19 @@ import {
 import {
   loadingListSelector,
   weeklyCheckSelector,
+  roleSelector,
 } from 'src/modules/firebase/selectors';
-
-import {margin} from 'src/components/config/spacing';
-import {rootSwitch} from 'src/config/navigator';
-
-import {LogBox} from 'react-native';
-LogBox.ignoreLogs(['Sending']);
 
 const stateSelector = createStructuredSelector({
   loading: loadingListSelector(),
   weeklyCheck: weeklyCheckSelector(),
+  role: roleSelector(),
 });
 
 const WishListScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {loading, weeklyCheck} = useSelector(stateSelector);
+  const {loading, weeklyCheck, role} = useSelector(stateSelector);
   // Set an initializing state whilst Firebase connects
   const [initializing, setInitializing] = useState(true);
   const [checkItems, setCheckItems] = useState({
@@ -81,10 +83,10 @@ const WishListScreen = () => {
 
   const fetchCheckItems = async () => {
     try {
-      const checkItemsRef = firestore()
+      const checkItemsRef = await firestore()
         .collection('checklist')
         .doc('checkItems');
-      await checkItemsRef.onSnapshot(documentSnapshot => {
+      checkItemsRef.onSnapshot(documentSnapshot => {
         if (documentSnapshot) {
           const obj = documentSnapshot.data();
           for (const item in documentSnapshot.data()['개인위생']) {
@@ -133,6 +135,8 @@ const WishListScreen = () => {
   };
 
   const createData = async () => {
+    console.log('role', role);
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'});}
     try {
       // const batch = firestore().batch();
       if (modalTitle === '생성' && weekTitle) {
@@ -163,6 +167,7 @@ const WishListScreen = () => {
   };
 
   const modifyData = async () => {
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'});}
     try {
       let doc = {...selectedDoc};
       doc.weekName = weekTitle;

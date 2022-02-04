@@ -3,12 +3,12 @@ import {utils} from '@react-native-firebase/app';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {useNavigation} from '@react-navigation/native';
-// import {createStructuredSelector} from 'reselect';
+import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {View, ScrollView, Image, KeyboardAvoidingView, TouchableOpacity, ActivityIndicator} from 'react-native';
 import imageCompress from 'react-native-compressor';
 import {launchImageLibrary} from 'react-native-image-picker';
-import {sortBy, merge, includes} from 'lodash';
+import {includes} from 'lodash';
 import {Header, Text, ThemedView} from 'src/components';
 import {Row, Col} from 'src/containers/Gird';
 import CheckBox from 'src/components/checkbox/CheckBox';
@@ -19,6 +19,7 @@ import ChooseItem from 'src/containers/ChooseItem';
 import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
 import {grey4, grey6} from 'src/components/config/colors';
 import {handleError, showSuccess} from 'src/utils/error';
+import {margin} from 'src/components/config/spacing';
 
 import {
   CHANGE_CHECK_LIST,
@@ -27,13 +28,18 @@ import {
   CHANGE_CHECK_FEEDBACK,
 } from 'src/modules/firebase/constants';
 
-import {margin} from 'src/components/config/spacing';
+import {roleSelector} from 'src/modules/firebase/selectors';
+
+const stateSelector = createStructuredSelector({
+  role: roleSelector(),
+});
 
 const FeedbackScreen = props => {
   const {item, fId, kitchenCheckItems} = props.route.params || '';
   // console.log('item: ', item);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const {role} = useSelector(stateSelector);
   const [checked, setChecked] = useState(item.checked);
   const [feedback, setFeedback] = useState(item.feedback);
   const [imagesUrl, setImagesUrl] = useState([]);
@@ -47,6 +53,7 @@ const FeedbackScreen = props => {
 
   // for Image Upload
   const onMediaUpload = async media => {
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     try {
       if (!media.didCancel) {
         // Upload Process
@@ -75,12 +82,14 @@ const FeedbackScreen = props => {
     }
   };
 
-  const onSelectImagePress = () =>
-    launchImageLibrary({mediaType: 'image'}, onMediaUpload);
+  const onSelectImagePress = () => {
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
+    return launchImageLibrary({mediaType: 'image'}, onMediaUpload);
+  };
 
   // for Image Delete
   const onMediaDelete = async media => {
-    // console.log('media', media);
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     try {
       // Delete Process
       const desertRef = await storage().ref(media.path);
@@ -95,6 +104,7 @@ const FeedbackScreen = props => {
   };
 
   const onChecked = async () => {
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     dispatch({type: CHANGE_CHECK_LIST});
     let selected = '식재관리';
     if (includes(item.checkName, 'hygiene')) {
@@ -131,6 +141,7 @@ const FeedbackScreen = props => {
   };
 
   const onFeedback = async () => {
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     dispatch({type: CHANGE_CHECK_LIST});
     let selected = '식재관리';
     if (includes(item.checkName, 'hygiene')) {
@@ -279,7 +290,7 @@ const FeedbackScreen = props => {
             </View>
             <Button
               loading={false}
-              title={'저장'}
+              title={'피드백 저장'}
               containerStyle={styles.marginBottom('big')}
               onPress={onFeedback}
             />

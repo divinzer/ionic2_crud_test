@@ -25,25 +25,23 @@ import {
 
 import {
   loadingListSelector,
-  isLoginSelector,
-  authSelector,
-  userSelector,
+  // isLoginSelector,
+  // authSelector,
+  // userSelector,
 } from 'src/modules/firebase/selectors';
 
 const stateSelector = createStructuredSelector({
   loading: loadingListSelector(),
-  isLogin: isLoginSelector(),
-  authState: authSelector(),
-  user: userSelector(),
+  // isLogin: isLoginSelector(),
+  // auth: authSelector(),
+  // user: userSelector(),
 });
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {loading, isLogin, authState, user} = useSelector(stateSelector);
-  // console.log('user: ', user);
+  const {loading} = useSelector(stateSelector);
   const [initializing, setInitializing] = useState(true);
-  // const [loading, setLoading] = useState(false);
   const [errors, setError] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -64,6 +62,7 @@ const LoginScreen = () => {
       );
       // console.log('logined', logined.user._user);
       dispatch({type: SIGN_IN_WITH_FIREBASE_SUCCESS, payload: logined.user});
+      await checkAuth();
       // navigation.navigate(rootSwitch.wish_list);
     } catch (e) {
       dispatch({type: SIGN_IN_WITH_FIREBASE_ERROR, payload: e});
@@ -71,38 +70,32 @@ const LoginScreen = () => {
     }
   };
 
-  const checkLogin = async () => {
+  const checkAuth = async () => {
     dispatch({type: FETCH_AUTH});
     try {
       const currentUser = await auth().currentUser;
-      console.log('currentUser: ', currentUser._user);
-      if (currentUser._user) {
-        dispatch({type: SIGN_IN_WITH_FIREBASE_SUCCESS, payload: currentUser});
-        // navigation.navigate(rootSwitch.wish_list);
-      }
+      // console.log('currentUser1: ', currentUser._user.uid);
+      const role = await firestore()
+        .collection('users')
+        .doc(currentUser._user.uid)
+        .get()
+        .then(documentSnapshot => {
+          if (documentSnapshot.exists) {
+            // console.log('onSnapshot: ', documentSnapshot.data());
+            return documentSnapshot.data();
+          } else {
+            return {
+              role: '',
+            };
+          }
+        });
+      dispatch({type: FETCH_AUTH_SUCCESS, payload: role});
+      // }
     } catch (e) {
       dispatch({type: FETCH_AUTH_ERROR, payload: e});
     }
   };
 
-  const checkAuth = async () => {
-    dispatch({type: FETCH_AUTH});
-    try {
-      if (user.uid) {
-        const checkAuth = await firestore()
-          .collection('users')
-          .doc(user.uid)
-          .get()
-          .then(documentSnapshot => {
-            return documentSnapshot.data();
-          });
-        dispatch({type: FETCH_AUTH_SUCCESS, payload: checkAuth});
-      }
-    } catch (e) {
-      dispatch({type: FETCH_AUTH_ERROR, payload: e});
-      setError({message: '권한이 없습니다.'});
-    }
-  };
   const sendEmail = async () => {
     try {
       await auth().sendPasswordResetEmail(email);

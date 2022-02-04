@@ -34,12 +34,14 @@ import {
   loadingListSelector,
   loadingCheckListSelector,
   checkListSelector,
+  roleSelector,
 } from 'src/modules/firebase/selectors';
 
 const stateSelector = createStructuredSelector({
   loading: loadingListSelector(),
   loading2: loadingCheckListSelector(),
   checkList: checkListSelector(),
+  role: roleSelector(),
 });
 
 import {margin, padding} from 'src/components/config/spacing';
@@ -51,6 +53,7 @@ const CheckListScreen = props => {
   // console.log('fId: ', fId);
   const weekItem = route.params.item;
   const dispatch = useDispatch();
+  const {loading, loading2, checkList, role} = useSelector(stateSelector);
   const [kitchenCheckItems, setKitchenCheckItems] = useState({
     개인위생: {},
     식재관리: {},
@@ -66,7 +69,6 @@ const CheckListScreen = props => {
   const [title2, setTitle2] = useState('');
   const [memo, setMemo] = useState(weekItem.kitchenMemo);
   const [selectedData, setSelectedData] = useState({name: '', order: ''});
-  const {loading, loading2, checkList} = useSelector(stateSelector);
   const [isModal, setModal] = useState('');
 
   const weeklyRef = firestore()
@@ -78,6 +80,7 @@ const CheckListScreen = props => {
     .doc('checkItems');
 
   const onChecked = async ck => {
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'});}
     dispatch({type: CHANGE_CHECK_LIST});
     let selected = '식재관리';
     if (includes(ck, 'hygiene')) {
@@ -110,8 +113,6 @@ const CheckListScreen = props => {
   };
 
   const onModal = (type, data) => {
-    // console.log('type: ', type);
-    // console.log('data: ', data);
     // type: new, title, item
     setModal(type);
     setSelectedData(data);
@@ -142,10 +143,8 @@ const CheckListScreen = props => {
             }
 
             // chkeck in checked
-            // console.log('aaa', documentSnapshot.docs[0].data()['조리장위생']);
             for (const item in documentSnapshot.docs[0].data()['개인위생']) {
               const value = documentSnapshot.docs[0].data()['개인위생'][item];
-              // console.log('v0', item);
               if (value === true) {
                 dispatch({
                   type: CHANGE_CHECK_LIST_SUCCESS,
@@ -156,7 +155,7 @@ const CheckListScreen = props => {
                 setTitle0(value);
               }
             }
-            // console.log('eere', documentSnapshot.docs[0].data());
+
             for (const item in documentSnapshot.docs[0].data()['식재관리']) {
               let value = documentSnapshot.docs[0].data()['식재관리'][item];
               // console.log('v1', item);
@@ -173,7 +172,7 @@ const CheckListScreen = props => {
 
             for (const item in documentSnapshot.docs[0].data()['조리장위생']) {
               let value = documentSnapshot.docs[0].data()['조리장위생'][item];
-              // console.log('v2', item);
+
               if (value === true) {
                 dispatch({
                   type: CHANGE_CHECK_LIST_SUCCESS,
@@ -279,6 +278,7 @@ const CheckListScreen = props => {
   };
 
   const addMemo = async () => {
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     try {
       await weeklyRef.update({
         ...weekItem,
@@ -301,7 +301,7 @@ const CheckListScreen = props => {
   };
 
   const modifyData = async () => {
-    // setPending(true);
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     let selected = '식재관리';
     if (includes(selectedData.order, 'hygiene')) {
       selected = '개인위생';
@@ -344,7 +344,7 @@ const CheckListScreen = props => {
   };
 
   const deleteData = async item => {
-    // setPending(true);
+    if (role === 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     let selected = '식재관리';
     if (includes(item.checkName, 'hygiene')) {
       selected = '개인위생';

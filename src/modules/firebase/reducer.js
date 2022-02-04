@@ -9,8 +9,10 @@ const initError = '';
 export const initState = {
   isLogin: false,
   loading: false,
-  user: {},
-  auth: '',
+  user: {
+    uid: '',
+  },
+  role: '',
   token: '',
   error: initError,
   checkList: [],
@@ -63,13 +65,11 @@ const firebaseReducer = produce((draft, action) => {
       draft.error = initError;
       break;
     case Actions.FETCH_AUTH_SUCCESS:
-      draft.auth = payload.role;
-      draft.isLogin = true;
+      draft.role = payload.role;
       draft.loading = false;
       break;
     case Actions.FETCH_AUTH_ERROR:
       draft.loading = false;
-      draft.isLogin = false;
       draft.error = notificationMessage(payload);
       break;
     // Check List
