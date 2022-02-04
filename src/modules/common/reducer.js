@@ -175,14 +175,14 @@ function commonReducer(state = initState, action = {}) {
     case Actions.CLOSE_GETTING_STARTED:
       return state.set('isGettingStarted', false);
 
-    // case REHYDRATE:
-    //   const data = payload && payload.common ? payload.common : Map();
-    //   const prepareData = initState.merge(data);
-    //   const language = prepareData.get('language')
-    //     ? prepareData.get('language')
-    //     : DEFAULT_LANGUAGE_CODE;
-    //   reloadApp(language);
-    //   return prepareData;
+    case REHYDRATE:
+      const data = payload && payload.common ? payload.common : Map();
+      const prepareData = initState.merge(data);
+      // const language = prepareData.get('language')
+      //   ? prepareData.get('language')
+      //   : DEFAULT_LANGUAGE_CODE;
+      // reloadApp(language);
+      return prepareData;
     case 'UPDATE_DEMO_CONFIG_SUCCESS':
       return initState.set('demo', fromJS(payload));
     default:

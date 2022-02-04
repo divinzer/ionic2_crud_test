@@ -150,16 +150,19 @@ const firebaseReducer = produce((draft, action) => {
       draft.loading = false;
       draft.error = notificationMessage(payload);
       break;
-    case REHYDRATE:
-      if (payload) {
-        // Restore only user and isLogin draft
-        return {
-          ...draft,
-          isLogin: payload.isLogin || false,
-        };
-      } else {
-        return initState;
-      }
+    // case REHYDRATE:
+    //   if (payload) {
+    //     // Restore only user and isLogin draft
+    //     // const {auth} = payload;
+    //     return {
+    //       ...draft,
+    //       // user: auth.user,
+    //       // token: auth.token,
+    //       // isLogin: auth.isLogin,
+    //     };
+    //   } else {
+    //     return initState;
+    //   }
   }
 }, initState);
 
