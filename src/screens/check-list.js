@@ -71,7 +71,7 @@ const CheckListScreen = props => {
   const [isModal, setModal] = useState('');
 
   const weeklyRef = firestore()
-    .collection('weeklyCheck')
+    .collection('weeklyCheckClone')
     .doc(route.params.item.id);
 
   const checklistRef = firestore()

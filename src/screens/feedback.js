@@ -1,11 +1,20 @@
 import React, {useState, useEffect} from 'react';
-import {utils} from '@react-native-firebase/app';
+// import {utils} from '@react-native-firebase/app';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
-import {useNavigation} from '@react-navigation/native';
+// import {useNavigation} from '@react-navigation/native';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
-import {View, ScrollView, Image, KeyboardAvoidingView, TouchableOpacity, ActivityIndicator} from 'react-native';
+import {
+  View,
+  ScrollView,
+  Image,
+  KeyboardAvoidingView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import Share from 'react-native-share';
 import imageCompress from 'react-native-compressor';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {includes} from 'lodash';
@@ -16,7 +25,11 @@ import Input from 'src/containers/input/Input';
 import Button from 'src/containers/Button';
 import Container from 'src/containers/Container';
 import ChooseItem from 'src/containers/ChooseItem';
-import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
+import {
+  TextHeader,
+  IconHeader,
+  ShareIcon,
+} from 'src/containers/HeaderComponent';
 import {grey4, grey6} from 'src/components/config/colors';
 import {handleError, showSuccess} from 'src/utils/error';
 import {margin} from 'src/components/config/spacing';
@@ -37,7 +50,7 @@ const stateSelector = createStructuredSelector({
 const FeedbackScreen = props => {
   const {item, fId, kitchenCheckItems} = props.route.params || '';
   // console.log('item: ', item);
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   const dispatch = useDispatch();
   const {role} = useSelector(stateSelector);
   const [checked, setChecked] = useState(item.checked);
@@ -46,10 +59,11 @@ const FeedbackScreen = props => {
   const [selectedM, selectMethod] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadTaskSnapshot, setUploadTaskSnapshot] = useState({});
-  const weeklyRef = firestore().collection('weeklyCheck').doc(fId);
+  const weeklyRef = firestore().collection('weeklyCheckClone').doc(fId);
   const stoageRef = storage().ref(
     `feedbackImage/${fId}/kitchen/${item.checkName}`,
   );
+  let base64Arr = [];
 
   // for Image Upload
   const onMediaUpload = async media => {
@@ -62,7 +76,7 @@ const FeedbackScreen = props => {
           maxWidth: 1024,
           quality: 0.8,
         });
-        const reference = await storage().ref(
+        const reference = storage().ref(
           `feedbackImage/${fId}/kitchen/${item.checkName}/${media.assets[0].fileName}`,
         );
         const task = reference.putFile(result);
@@ -92,7 +106,7 @@ const FeedbackScreen = props => {
     if (role !== 'admin' || !role) { return handleError({message: '권한이 없습니다.'})}
     try {
       // Delete Process
-      const desertRef = await storage().ref(media.path);
+      const desertRef = storage().ref(media.path);
       await desertRef.delete();
       showSuccess({message: '파일을 삭제했습니다.'});
       fetchImages();
@@ -101,6 +115,56 @@ const FeedbackScreen = props => {
         message: '파일을 삭제하지 못했습니다. 관리자에게 문의하세요',
       });
     }
+  };
+
+  const fetchImages = async () => {
+    let i = 0;
+    setImagesUrl([]);
+    await stoageRef.list().then(result => {
+      if (result.items.length > 0) {
+        result.items.forEach(ref => {
+          // console.log('ref: ', ref);
+          storage()
+            .ref(ref.fullPath)
+            .getDownloadURL()
+            .then(url => {
+              setImagesUrl(imagesUri => [
+                ...imagesUri,
+                {id: i.toString(), url: url, path: ref.path},
+              ]);
+              i++;
+            });
+        });
+      }
+    });
+    // return Promise.resolve();
+  };
+
+  const getBase64 = async () => {
+    base64Arr = [];
+    imagesUrl.forEach(image => {
+      ReactNativeBlobUtil.fetch('GET', image.url).then(res => {
+        let base64Str = res.base64();
+        // var imageUrl = 'data:image/png;base64,' + base64Str;
+        base64Arr.push('data:image/png;base64,' + base64Str);
+        if (base64Arr.length === imagesUrl.length) {
+          let shareImage = {
+            title: item.value,
+            message: item.feedback,
+            urls: base64Arr,
+          };
+          Share.open(shareImage)
+            .then((res) => {
+              // console.log(res);
+            })
+            .catch((err) => {
+              // err && console.log(err);
+            });
+        }
+        // let text = res.text()
+        // let json = res.json()
+      });
+    });
   };
 
   const onChecked = async () => {
@@ -185,29 +249,6 @@ const FeedbackScreen = props => {
     }
   };
 
-  const fetchImages = async () => {
-    let i = 0;
-    setImagesUrl([]);
-    await stoageRef.list().then(result => {
-      if (result.items.length > 0) {
-        result.items.forEach(ref => {
-          console.log('ref: ', ref);
-          storage()
-            .ref(ref.fullPath)
-            .getDownloadURL()
-            .then(url => {
-              setImagesUrl(imagesUri => [
-                ...imagesUri,
-                {id: i.toString(), url: url, path: ref.path},
-              ]);
-              i++;
-            });
-        });
-      }
-      // return Promise.resolve();
-    });
-  };
-
   useEffect(() => {
     fetchImages();
   }, [])
@@ -240,6 +281,7 @@ const FeedbackScreen = props => {
       <Header
         leftComponent={<IconHeader />}
         centerComponent={<TextHeader title={'피드백 사항'} />}
+        rightComponent={<ShareIcon onShare={getBase64} />}
       />
       <KeyboardAvoidingView behavior="height" style={styles.keyboard}>
         <ScrollView>

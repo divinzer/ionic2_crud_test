@@ -1,6 +1,6 @@
 import IconHeader from './Icon';
 import SignOutIcon from './SignOutIcon';
-import SaveIcon from './SaveIcon';
+import ShareIcon from './ShareIcon';
 import TextHeader from './TextHeader';
 
-export {IconHeader, SaveIcon, SignOutIcon, TextHeader};
+export {IconHeader, ShareIcon, SignOutIcon, TextHeader};

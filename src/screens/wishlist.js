@@ -55,12 +55,12 @@ const WishListScreen = () => {
   const [weekTitle, setWeekTitle] = useState('');
   const [selectedDoc, setSelectedDoc] = useState({id: '', weekName: ''});
   const weeklyRef = firestore()
-    .collection('weeklyCheck')
+    .collection('weeklyCheckClone')
     .where('isDeleted', '==', false)
     .orderBy('writtenAt', 'desc')
     .limit(8);
 
-  const checklistRef = firestore().collection('weeklyCheck');
+  const checklistRef = firestore().collection('weeklyCheckClone');
   let willFocusSubscription = null;
   // Handle user state changes
   function onAuthStateChanged(user) {

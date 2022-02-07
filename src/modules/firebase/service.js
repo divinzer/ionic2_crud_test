@@ -22,7 +22,7 @@ export const isLogin = () => auth().get(`/v1/current`);
 //   // return firestore().collection('Users').doc(user.user.id).set();
 // };
 // export const fetchWeeklyCheck = () => {
-//   const ref = firestore().collection('weeklyCheck');
+//   const ref = firestore().collection('weeklyCheckClone');
 //   ref.onSnapshot(querySnapshot => {
 //     const list = [];
 //     querySnapshot.forEach(doc => {
