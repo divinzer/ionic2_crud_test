@@ -7,7 +7,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {StyleSheet, View, ActivityIndicator, RefreshControl} from 'react-native';
 import {Header, ThemedView, Modal} from 'src/components';
 import {SwipeListView} from 'react-native-swipe-list-view';
-import ItemWishlist from './ItemWishlist';
+import HygieneItem from './HygieneItem';
 import {TextHeader, SignOutIcon} from 'src/containers/HeaderComponent';
 import Empty from 'src/containers/Empty';
 import Button from 'src/containers/Button';
@@ -37,7 +37,7 @@ const stateSelector = createStructuredSelector({
   role: roleSelector(),
 });
 
-const WishListScreen = () => {
+const hygieneListScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const {loading, weeklyCheck, role} = useSelector(stateSelector);
@@ -248,7 +248,7 @@ const WishListScreen = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         renderItem={({item, index}) => (
-          <ItemWishlist
+          <HygieneItem
             item={item}
             key={index}
             style={index === 0 ? styles.firstItem : undefined}
@@ -344,4 +344,4 @@ const styles = StyleSheet.create({
   }),
 });
 
-export default WishListScreen;
+export default hygieneListScreen;

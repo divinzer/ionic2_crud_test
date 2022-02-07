@@ -8,9 +8,9 @@ import {useSelector, useDispatch} from 'react-redux';
 
 import Loading from 'src/screens/loading';
 import Login from 'src/screens/login';
-import CheckListScreen from 'src/screens/check-list';
+import CheckListScreen from 'src/screens/checkList';
 import FeedbackScreen from 'src/screens/feedback';
-import WishListScreen from 'src/screens/wishlist';
+import HygieneListScreen from 'src/screens/hygieneList';
 // import {
 //   loadingSelector,
 //   requiredLoginSelector,
@@ -46,8 +46,8 @@ function RootStack({loading}) {
         <>
           <Stack.Screen
             options={{headerShown: false}}
-            name={rootSwitch.wish_list}
-            component={WishListScreen}
+            name={rootSwitch.hygiene_list}
+            component={HygieneListScreen}
           />
           <Stack.Screen
             options={{headerShown: false}}

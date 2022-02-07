@@ -13,7 +13,7 @@ import Button from 'src/containers/Button';
 import Container from 'src/containers/Container';
 import ButtonSwiper from 'src/containers/ButtonSwiper';
 import ButtonLeftSwiper from 'src/containers/ButtonLeftSwiper';
-import CheckListItem from './check-list-item';
+import CheckListItem from './checkListItem';
 import {TextHeader, IconHeader} from 'src/containers/HeaderComponent';
 import {grey4, grey6, blue} from 'src/components/config/colors';
 import {handleError, showSuccess} from 'src/utils/error';

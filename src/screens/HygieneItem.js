@@ -8,7 +8,7 @@ import {padding, margin} from 'src/components/config/spacing';
 import {sizes} from 'src/components/config/fonts';
 import {white, black, orange, grey4} from 'src/components/config/colors';
 
-const ItemWishlist = React.memo(props => {
+const HygieneItem = React.memo(props => {
   const navigation = useNavigation();
   const {item, style, onModal} = props;
   const {weekName, type, isDeleted, hasFeedback, id, kitchenMemo, writeenAt} = item;
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ItemWishlist;
+export default HygieneItem;
