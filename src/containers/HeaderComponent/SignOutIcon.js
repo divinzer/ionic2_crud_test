@@ -11,7 +11,7 @@ import {white, black, orange, grey4} from 'src/components/config/colors';
 
 import {SIGN_OUT_SUCCESS} from 'src/modules/firebase/constants';
 
-const CartIcon = () => {
+const SignOutIcon = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -49,4 +49,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CartIcon;
+export default SignOutIcon;

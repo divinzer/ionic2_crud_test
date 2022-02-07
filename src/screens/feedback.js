@@ -1,8 +1,6 @@
 import React, {useState, useEffect} from 'react';
-// import {utils} from '@react-native-firebase/app';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
-// import {useNavigation} from '@react-navigation/native';
 import {createStructuredSelector} from 'reselect';
 import {useSelector, useDispatch} from 'react-redux';
 import {
@@ -49,8 +47,6 @@ const stateSelector = createStructuredSelector({
 
 const FeedbackScreen = props => {
   const {item, fId, kitchenCheckItems} = props.route.params || '';
-  // console.log('item: ', item);
-  // const navigation = useNavigation();
   const dispatch = useDispatch();
   const {role} = useSelector(stateSelector);
   const [checked, setChecked] = useState(item.checked);
